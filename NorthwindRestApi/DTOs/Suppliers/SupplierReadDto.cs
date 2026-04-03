@@ -1,0 +1,37 @@
+﻿using NorthwindRestApi.DTOs.Products;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace NorthwindRestApi.DTOs.Suppliers
+{
+    public class SupplierReadDto
+    {
+        public int SupplierID { get; set; }
+
+        public string CompanyName { get; set; }
+
+        public string? ContactName { get; set; }
+
+        public string? ContactTitle { get; set; }
+
+        public string? Address { get; set; }
+
+        public string? City { get; set; }
+
+        public string? Region { get; set; }
+
+        public string? PostalCode { get; set; }
+
+        public string? Country { get; set; }
+
+        public string? Phone { get; set; }
+
+        public string? Fax { get; set; }
+
+        public string? HomePage { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public List<ProductListDto> Products { get; set; } = new();
+        public int? ProductCount { get; set; }
+    }
+}
