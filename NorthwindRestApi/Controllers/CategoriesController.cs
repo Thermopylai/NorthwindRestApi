@@ -18,7 +18,7 @@ namespace NorthwindRestApi.Controllers
             _service = service;
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadCategories)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadCategories)]
         [HttpGet]
         [ProducesResponseType(typeof(List<CategoryListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<CategoryListDto>>> GetAll(CancellationToken ct)

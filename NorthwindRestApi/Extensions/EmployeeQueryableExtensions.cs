@@ -11,6 +11,8 @@ namespace NorthwindRestApi.Extensions
             this IQueryable<EmployeeListDto> query,
             EmployeeQueryParameters parameters)
         {
+            query = query.IgnoreQueryFilters();
+
             if (parameters.Start.HasValue)
             {
                 var startDate = DateTime.SpecifyKind(
@@ -35,7 +37,7 @@ namespace NorthwindRestApi.Extensions
 
             if (parameters.IsDeleted.HasValue)
             {
-                query = query.IgnoreQueryFilters().Where(p => p.IsDeleted == parameters.IsDeleted.Value);
+                query = query.Where(p => p.IsDeleted == parameters.IsDeleted.Value);
             }
 
             if (parameters.ReportsTo.HasValue)

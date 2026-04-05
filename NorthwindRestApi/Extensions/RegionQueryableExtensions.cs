@@ -9,9 +9,11 @@ namespace NorthwindRestApi.Extensions
                 this IQueryable<RegionListDto> query,
                 RegionQueryParameters parameters)
         {
+            query = query.IgnoreQueryFilters();
+
             if (parameters.IsDeleted.HasValue)
             {
-                query = query.IgnoreQueryFilters().Where(p => p.IsDeleted == parameters.IsDeleted.Value);
+                query = query.Where(p => p.IsDeleted == parameters.IsDeleted.Value);
             }
 
             return query;
