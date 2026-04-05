@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NorthwindRestApi.Common;
 using NorthwindRestApi.DTOs.Order_Details;
 using NorthwindRestApi.DTOs.Orders;
 
@@ -59,7 +60,22 @@ namespace NorthwindRestApi.Extensions
 
             if (parameters.VatRate.HasValue)
             {
-                query = query.Where(p => p.VatRate == parameters.VatRate.Value);
+                if (parameters.VatRate.Value == VatRules.ReducedVatRate)
+                {
+                    query = query.Where(p =>
+                        p.CategoryName != null &&
+                        VatRules.ReducedVatCategories.Contains(p.CategoryName));
+                }
+                else if (parameters.VatRate.Value == VatRules.StandardVatRate)
+                {
+                    query = query.Where(p =>
+                        p.CategoryName == null ||
+                        !VatRules.ReducedVatCategories.Contains(p.CategoryName));
+                }
+                else
+                {
+                    query = query.Where(p => false);
+                }
             }
 
             return query;
