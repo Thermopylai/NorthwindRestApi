@@ -19,7 +19,7 @@ namespace NorthwindRestApi.Controllers
             _service = service;
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
         [HttpGet]
         [ProducesResponseType(typeof(List<ProductListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<ProductListDto>>> GetAll(CancellationToken ct)
@@ -28,7 +28,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(products);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ProductReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,7 +42,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(product);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
         [HttpGet("by-category/{categoryId:int}")]
         [ProducesResponseType(typeof(List<ProductListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -56,7 +56,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(products);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<ProductListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<ProductListDto>>> GetPaged(
@@ -69,7 +69,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<ProductListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -90,7 +90,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageProducts)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageProducts)]
         [HttpPost]
         [ProducesResponseType(typeof(ProductReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<ProductReadDto>> Create(ProductCreateDto dto, CancellationToken ct)
@@ -100,7 +100,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.ProductID }, created);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageProducts)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageProducts)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(PagedResult<ProductReadDto>), StatusCodes.Status200OK)]
@@ -114,7 +114,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageProducts)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageProducts)]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

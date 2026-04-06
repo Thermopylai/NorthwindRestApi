@@ -30,7 +30,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
-        [HttpGet("{orderId:int}, {productId:int}")]
+        [HttpGet("{orderId:int}/{productId:int}")]
         [ProducesResponseType(typeof(Order_DetailReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Order_DetailReadDto>> GetById(int orderId, int productId, CancellationToken ct)
@@ -115,7 +115,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
-        [HttpPut("{orderId:int}, {productId:int}")]
+        [HttpPut("{orderId:int}/{productId:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Order_DetailReadDto), StatusCodes.Status200OK)]
         public async Task<ActionResult<Order_DetailReadDto?>> Update(int orderId, int productId, Order_DetailUpdateDto dto, CancellationToken ct)
@@ -129,7 +129,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
-        [HttpDelete("{orderId:int}, {productId:int}")]
+        [HttpDelete("{orderId:int}/{productId:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(int orderId, int productId, CancellationToken ct)
