@@ -9,8 +9,6 @@ namespace NorthwindRestApi.Extensions
                 this IQueryable<CustomerListDto> query,
                 CustomerQueryParameters parameters)
         {
-            query = query.IgnoreQueryFilters();
-
             if (!string.IsNullOrWhiteSpace(parameters.Country))
             {
                 query = query.Where(p => p.Country != null &&
@@ -31,7 +29,7 @@ namespace NorthwindRestApi.Extensions
 
             if (parameters.IsDeleted.HasValue)
             {
-                query = query.Where(p => p.IsDeleted == parameters.IsDeleted.Value);
+                query = query.IgnoreQueryFilters().Where(p => p.IsDeleted == parameters.IsDeleted.Value);
             }
 
             return query;

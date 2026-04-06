@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NorthwindRestApi.Common;
 using NorthwindRestApi.DTOs.Products;
 
 namespace NorthwindRestApi.Extensions
@@ -18,8 +17,6 @@ namespace NorthwindRestApi.Extensions
             this IQueryable<ProductListDto> query,
             ProductQueryParameters parameters)
         {
-            query = query.IgnoreQueryFilters();
-
             if (parameters.SupplierId.HasValue)
             {
                 query = query.Where(p => p.SupplierID == parameters.SupplierId.Value);
@@ -32,7 +29,7 @@ namespace NorthwindRestApi.Extensions
 
             if (parameters.Discontinued.HasValue)
             {
-                query = query.Where(p => p.Discontinued == parameters.Discontinued.Value);
+                query = query.IgnoreQueryFilters().Where(p => p.Discontinued == parameters.Discontinued.Value);
             }
 
             if (parameters.MinPrice.HasValue)
@@ -49,22 +46,7 @@ namespace NorthwindRestApi.Extensions
 
             if (parameters.VatRate.HasValue)
             {
-                if (parameters.VatRate.Value == VatRules.ReducedVatRate)
-                {
-                    query = query.Where(p =>
-                        p.CategoryName != null &&
-                        VatRules.ReducedVatCategories.Contains(p.CategoryName));
-                }
-                else if (parameters.VatRate.Value == VatRules.StandardVatRate)
-                {
-                    query = query.Where(p =>
-                        p.CategoryName == null ||
-                        !VatRules.ReducedVatCategories.Contains(p.CategoryName));
-                }
-                else
-                {
-                    query = query.Where(p => false);
-                }
+                query = query.Where(p => p.VatRate == parameters.VatRate.Value);
             }
 
             return query;

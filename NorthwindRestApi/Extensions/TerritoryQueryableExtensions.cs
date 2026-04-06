@@ -9,8 +9,6 @@ namespace NorthwindRestApi.Extensions
                 this IQueryable<TerritoryReadDto> query,
                 TerritoryQueryParameters parameters)
         {
-            query = query.IgnoreQueryFilters();
-
             if (parameters.RegionID.HasValue)
             {
                 query = query.Where(p => p.RegionID == parameters.RegionID.Value);
@@ -18,7 +16,7 @@ namespace NorthwindRestApi.Extensions
 
             if (parameters.IsDeleted.HasValue)
             {
-                query = query.Where(p => p.IsDeleted == parameters.IsDeleted.Value);
+                query = query.IgnoreQueryFilters().Where(p => p.IsDeleted == parameters.IsDeleted.Value);
             }
 
             return query;

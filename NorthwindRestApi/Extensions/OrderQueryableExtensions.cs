@@ -9,8 +9,6 @@ namespace NorthwindRestApi.Extensions
             this IQueryable<OrderListDto> query,
             OrderQueryParameters parameters)
         {
-            query = query.IgnoreQueryFilters();
-
             if (parameters.EmployeeId.HasValue)
             {
                 query = query.Where(o => o.EmployeeID == parameters.EmployeeId.Value);
@@ -45,7 +43,7 @@ namespace NorthwindRestApi.Extensions
 
             if (parameters.IsDeleted.HasValue)
             {
-                query = query.Where(o => o.IsDeleted == parameters.IsDeleted.Value);
+                query = query.IgnoreQueryFilters().Where(o => o.IsDeleted == parameters.IsDeleted.Value);
             }
 
             return query;

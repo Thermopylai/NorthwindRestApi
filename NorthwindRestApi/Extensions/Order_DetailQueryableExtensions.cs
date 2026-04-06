@@ -11,8 +11,6 @@ namespace NorthwindRestApi.Extensions
             this IQueryable<Order_DetailReadDto> query,
             Order_DetailQueryParameters parameters)
         {
-            query = query.IgnoreQueryFilters();
-
             if (parameters.OrderId.HasValue)
             {
                 query = query.Where(p => p.OrderID == parameters.OrderId.Value);
@@ -55,7 +53,7 @@ namespace NorthwindRestApi.Extensions
 
             if (parameters.IsDeleted.HasValue)
             {
-                query = query.Where(p => p.IsDeleted == parameters.IsDeleted.Value);
+                query = query.IgnoreQueryFilters().Where(p => p.IsDeleted == parameters.IsDeleted.Value);
             }
 
             if (parameters.VatRate.HasValue)

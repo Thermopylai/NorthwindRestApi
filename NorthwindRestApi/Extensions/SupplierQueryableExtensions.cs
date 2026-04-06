@@ -9,11 +9,9 @@ namespace NorthwindRestApi.Extensions
                 this IQueryable<SupplierListDto> query,
                 SupplierQueryParameters parameters)
         {
-            query = query.IgnoreQueryFilters();
-
             if (parameters.IsDeleted.HasValue)
             {
-                query = query.Where(p => p.IsDeleted == parameters.IsDeleted.Value);
+                query = query.IgnoreQueryFilters().Where(p => p.IsDeleted == parameters.IsDeleted.Value);
             }
 
             return query;
