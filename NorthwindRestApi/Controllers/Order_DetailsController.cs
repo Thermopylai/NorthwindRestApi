@@ -143,7 +143,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         //[Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
-        [HttpPost("{orderId:int}/{productId:int}/restore")]
+        [HttpPut("{orderId:int}/{productId:int}/restore")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Restore(int orderId, int productId, CancellationToken ct)

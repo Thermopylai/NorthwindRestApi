@@ -109,7 +109,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         //[Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
-        [HttpPost("{id}/restore")]
+        [HttpPut("{id}/restore")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Restore(string id, CancellationToken ct)
