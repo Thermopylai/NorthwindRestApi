@@ -18,7 +18,7 @@ namespace NorthwindRestApi.Controllers
             _service = service;
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
         [HttpGet]
         [ProducesResponseType(typeof(List<RegionListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<RegionListDto>>> GetAll(CancellationToken ct)
@@ -27,7 +27,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(regions);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(RegionReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -41,7 +41,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(region);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<RegionListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<RegionListDto>>> GetPaged(
@@ -53,7 +53,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<RegionListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -69,7 +69,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageRegions)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageRegions)]
         [HttpPost]
         [ProducesResponseType(typeof(RegionReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<RegionReadDto>> Create(RegionCreateDto dto, CancellationToken ct)
@@ -79,7 +79,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.RegionID }, created);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageRegions)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageRegions)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(RegionReadDto), StatusCodes.Status200OK)]
@@ -93,13 +93,27 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageRegions)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageRegions)]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var success = await _service.DeleteAsync(id, ct);
+
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        //[Authorize(Policy = AuthorizationPolicies.CanManageRegions)]
+        [HttpPost("{id:int}/restore")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Restore(int id, CancellationToken ct)
+        {
+            var success = await _service.RestoreAsync(id, ct);
 
             if (!success)
                 return NotFound();

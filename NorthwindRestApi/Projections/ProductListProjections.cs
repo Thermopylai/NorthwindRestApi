@@ -52,6 +52,9 @@ namespace NorthwindRestApi.Projections
                     PriceWithVat = x.UnitPrice.HasValue
                         ? Math.Round(x.UnitPrice.Value * (1 + x.VatRate), 2)
                         : null,
+                    StockValue = x.UnitPrice.HasValue && x.UnitsInStock.HasValue
+                        ? Math.Round(x.UnitPrice.Value * x.UnitsInStock.Value, 2)
+                        : null,
                     StockValueWithVat = x.UnitPrice.HasValue && x.UnitsInStock.HasValue
                         ? Math.Round(x.UnitPrice.Value * (1 + x.VatRate) * x.UnitsInStock.Value, 2)
                         : null

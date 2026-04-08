@@ -172,6 +172,10 @@ namespace NorthwindRestApi.Extensions
                     ? query.OrderByDescending(o => o.PriceWithVat)
                     : query.OrderBy(p => p.PriceWithVat),
 
+                "stockvalue" => descending
+                    ? query.OrderByDescending(p => p.StockValue)
+                    : query.OrderBy(p => p.StockValue),
+
                 "stockvaluewithvat" => descending
                     ? query.OrderByDescending(p => p.StockValueWithVat)
                     : query.OrderBy(p => p.StockValueWithVat),

@@ -19,9 +19,9 @@ namespace NorthwindRestApi.Services
             _db = db;
         }
 
-        public async Task<List<OrderListDto>> GetAllAsync(CancellationToken ct)
+        public async Task<List<OrderReadDto>> GetAllAsync(CancellationToken ct)
         {
-            return await BuildOrderListQuery()
+            return await BuildOrderReadQuery()
                 .OrderBy(o => o.OrderID)
                 .ToListAsync(ct);
         }
@@ -65,11 +65,11 @@ namespace NorthwindRestApi.Services
                 .ToPagedResultAsync(page, pageSize, ct);
         }
 
-        public async Task<PagedResult<OrderListDto>> SearchAsync(
+        public async Task<PagedResult<OrderReadDto>> SearchAsync(
             OrderQueryParameters parameters, 
             CancellationToken ct)
         {
-            var query = BuildOrderListQuery()
+            var query = BuildOrderReadQuery()
                 .ApplyFilter(parameters)
                 .ApplySearch(parameters.SearchTerm)
                 .ApplySorting(parameters.OrderBy, parameters.Descending);
@@ -138,6 +138,14 @@ namespace NorthwindRestApi.Services
                 .Where(o => o.OrderID == id)
                 .ExecuteUpdateAsync(u => u.SetProperty(o => o.IsDeleted, true), ct);
 
+            return affected > 0;
+        }
+
+        public async Task<bool> RestoreAsync(int id, CancellationToken ct)
+        {
+            var affected = await _db.Orders
+                .Where(o => o.OrderID == id)
+                .ExecuteUpdateAsync(u => u.SetProperty(o => o.IsDeleted, false), ct);
             return affected > 0;
         }
 

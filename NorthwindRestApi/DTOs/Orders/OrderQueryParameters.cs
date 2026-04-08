@@ -4,6 +4,8 @@
     {
         // Filter parameters
         public int? EmployeeId { get; set; }
+        public string? CustomerId { get; set; } = null;
+        public int? ProductId { get; set; }
         public DateTime? Start { get; set; }
         public DateTime? End { get; set; }
         public int? ShipVia { get; set; }

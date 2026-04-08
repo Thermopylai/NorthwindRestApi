@@ -5,8 +5,8 @@ namespace NorthwindRestApi.Extensions
 {
     public static class OrderQueryableExtensions
     {
-        public static IQueryable<OrderListDto> ApplyFilter(
-            this IQueryable<OrderListDto> query,
+        public static IQueryable<OrderReadDto> ApplyFilter(
+            this IQueryable<OrderReadDto> query,
             OrderQueryParameters parameters)
         {
             query = query.IgnoreQueryFilters();
@@ -14,6 +14,17 @@ namespace NorthwindRestApi.Extensions
             if (parameters.EmployeeId.HasValue)
             {
                 query = query.Where(o => o.EmployeeID == parameters.EmployeeId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(parameters.CustomerId))
+            {
+                query = query.Where(o => o.CustomerID == parameters.CustomerId);
+            }
+
+            if (parameters.ProductId.HasValue)
+            {
+                query = query.Where(o =>
+                    o.OrderDetails.Any(od => od.ProductID == parameters.ProductId.Value));
             }
 
             if (parameters.Start.HasValue)
@@ -51,8 +62,8 @@ namespace NorthwindRestApi.Extensions
             return query;
         }
 
-        public static IQueryable<OrderListDto> ApplySearch(
-            this IQueryable<OrderListDto> query,
+        public static IQueryable<OrderReadDto> ApplySearch(
+            this IQueryable<OrderReadDto> query,
             string? searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -73,8 +84,8 @@ namespace NorthwindRestApi.Extensions
                 (o.ShipCountry != null && o.ShipCountry.Contains(term)));
         }
 
-        public static IQueryable<OrderListDto> ApplySorting(
-            this IQueryable<OrderListDto> query,
+        public static IQueryable<OrderReadDto> ApplySorting(
+            this IQueryable<OrderReadDto> query,
             string? orderBy,
             bool descending)
         {
@@ -122,13 +133,29 @@ namespace NorthwindRestApi.Extensions
                     ? query.OrderByDescending(o => o.ShipViaCompanyName)
                     : query.OrderBy(o => o.ShipViaCompanyName),
 
+                "totalamount" => descending
+                    ? query.OrderByDescending(o => o.TotalAmount)
+                    : query.OrderBy(o => o.TotalAmount),
+
+                "totalvatamount" => descending
+                    ? query.OrderByDescending(o => o.TotalVatAmount)
+                    : query.OrderBy(o => o.TotalVatAmount),
+                
                 "freight" => descending
                     ? query.OrderByDescending(o => o.Freight)
                     : query.OrderBy(o => o.Freight),
 
+                "totalamountwithvat" => descending
+                    ? query.OrderByDescending(o => o.TotalAmountWithVat)
+                    : query.OrderBy(o => o.TotalAmountWithVat),
+
                 "shipname" => descending
                     ? query.OrderByDescending(o => o.ShipName)
                     : query.OrderBy(o => o.ShipName),
+
+                "finalamount" => descending
+                    ? query.OrderByDescending(o => o.FinalAmount)
+                    : query.OrderBy(o => o.FinalAmount),
 
                 "shipaddress" => descending
                     ? query.OrderByDescending(o => o.ShipAddress)

@@ -119,6 +119,14 @@ namespace NorthwindRestApi.Services
             return affected > 0;
         }
 
+        public async Task<bool> RestoreAsync(int orderId, int productId, CancellationToken ct)
+        {
+            var affected = await _db.Order_Details
+                .Where(od => od.OrderID == orderId && od.ProductID == productId)
+                .ExecuteUpdateAsync(u => u.SetProperty(od => od.IsDeleted, false), ct);
+            return affected > 0;
+        }
+
         private IQueryable<Order_DetailReadDto> BuildOrder_DetailReadQuery()
         {
             return Order_DetailReadProjections.Build(_db.Order_Details.AsNoTracking());

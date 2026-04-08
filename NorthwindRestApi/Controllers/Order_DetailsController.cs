@@ -20,7 +20,7 @@ namespace NorthwindRestApi.Controllers
             _service = service;
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet]
         [ProducesResponseType(typeof(List<Order_DetailReadDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<Order_DetailReadDto>>> GetAll(CancellationToken ct)
@@ -29,7 +29,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(order_details);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("{orderId:int}/{productId:int}")]
         [ProducesResponseType(typeof(Order_DetailReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,7 +43,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(order_detail);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("by-order/{orderId:int}")]
         [ProducesResponseType(typeof(List<Order_DetailReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +57,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(order_details);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("by-product/{productId:int}")]
         [ProducesResponseType(typeof(List<Order_DetailReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -71,7 +71,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(order_details);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<Order_DetailReadDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<Order_DetailReadDto>>> GetPaged(
@@ -83,7 +83,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<Order_DetailReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -104,7 +104,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
         [HttpPost]
         [ProducesResponseType(typeof(Order_DetailReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<Order_DetailReadDto>> Create(Order_DetailCreateDto dto, CancellationToken ct)
@@ -114,7 +114,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { orderId = created.OrderID, productId = created.ProductID }, created);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
         [HttpPut("{orderId:int}/{productId:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Order_DetailReadDto), StatusCodes.Status200OK)]
@@ -128,13 +128,27 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
         [HttpDelete("{orderId:int}/{productId:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(int orderId, int productId, CancellationToken ct)
         {
             var success = await _service.DeleteAsync(orderId, productId, ct);
+
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        //[Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
+        [HttpPost("{orderId:int}/{productId:int}/restore")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Restore(int orderId, int productId, CancellationToken ct)
+        {
+            var success = await _service.RestoreAsync(orderId, productId, ct);
 
             if (!success)
                 return NotFound();

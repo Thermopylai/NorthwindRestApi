@@ -28,7 +28,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(suppliers);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadSuppliers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadSuppliers)]
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(SupplierReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,7 +42,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(supplier);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadSuppliers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadSuppliers)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<SupplierListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<SupplierListDto>>> GetPaged(
@@ -54,7 +54,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadSuppliers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadSuppliers)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<SupplierListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -70,7 +70,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageSuppliers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageSuppliers)]
         [HttpPost]
         [ProducesResponseType(typeof(SupplierReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<SupplierReadDto>> Create(SupplierCreateDto dto, CancellationToken ct)
@@ -80,7 +80,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.SupplierID }, created);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageSuppliers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageSuppliers)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(SupplierReadDto), StatusCodes.Status200OK)]
@@ -94,13 +94,27 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageSuppliers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageSuppliers)]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var success = await _service.DeleteAsync(id, ct);
+
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        //[Authorize(Policy = AuthorizationPolicies.CanManageSuppliers)]
+        [HttpPost("{id:int}/restore")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Restore(int id, CancellationToken ct)
+        {
+            var success = await _service.RestoreAsync(id, ct);
 
             if (!success)
                 return NotFound();

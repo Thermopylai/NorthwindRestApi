@@ -12,5 +12,6 @@ namespace NorthwindRestApi.Services.Interfaces
         Task<TerritoryReadDto> CreateAsync(TerritoryCreateDto dto, CancellationToken ct);
         Task<TerritoryReadDto?> UpdateAsync(string id, TerritoryUpdateDto dto, CancellationToken ct);
         Task<bool> DeleteAsync(string id, CancellationToken ct);
+        Task<bool> RestoreAsync(string id, CancellationToken ct);
     }
 }

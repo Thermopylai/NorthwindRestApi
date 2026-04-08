@@ -127,5 +127,19 @@ namespace NorthwindRestApi.Controllers
 
             return NoContent();
         }
+
+        //[Authorize(Policy = AuthorizationPolicies.CanManageProducts)]
+        [HttpPost("{id:int}/restore")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Restore(int id, CancellationToken ct)
+        {
+            var success = await _service.RestoreAsync(id, ct);
+
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
     }
 }

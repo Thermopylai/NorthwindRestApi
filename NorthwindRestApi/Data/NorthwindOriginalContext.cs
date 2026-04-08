@@ -44,7 +44,7 @@ public partial class NorthwindOriginalContext : DbContext
 
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            //entity.HasQueryFilter(e => !e.IsDeleted);
 
             entity.Property(e => e.CustomerID).IsFixedLength();
 
@@ -74,7 +74,7 @@ public partial class NorthwindOriginalContext : DbContext
 
         modelBuilder.Entity<CustomerDemographic>(entity =>
         {
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            //entity.HasQueryFilter(e => !e.IsDeleted);
 
             entity.HasKey(e => e.CustomerTypeID).IsClustered(false);
 
@@ -83,7 +83,7 @@ public partial class NorthwindOriginalContext : DbContext
 
         modelBuilder.Entity<Employee>(entity =>
         {
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            //entity.HasQueryFilter(e => !e.IsDeleted);
 
             entity.HasOne(d => d.ReportsToNavigation).WithMany(p => p.InverseReportsToNavigation).HasConstraintName("FK_Employees_Employees");
 
@@ -115,7 +115,7 @@ public partial class NorthwindOriginalContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            //entity.HasQueryFilter(e => !e.IsDeleted);
 
             entity.Property(e => e.CustomerID).IsFixedLength();
             entity.Property(e => e.Freight).HasDefaultValue(0m, "DF_Orders_Freight");
@@ -129,7 +129,7 @@ public partial class NorthwindOriginalContext : DbContext
 
         modelBuilder.Entity<Order_Detail>(entity =>
         {
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            //entity.HasQueryFilter(e => !e.IsDeleted);
 
             entity.HasKey(e => new { e.OrderID, e.ProductID }).HasName("PK_Order_Details");
 
@@ -146,7 +146,7 @@ public partial class NorthwindOriginalContext : DbContext
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasQueryFilter(e => !e.Discontinued);
+            //entity.HasQueryFilter(e => !e.Discontinued);
 
             entity.Property(e => e.ReorderLevel).HasDefaultValue((short)0, "DF_Products_ReorderLevel");
             entity.Property(e => e.UnitPrice).HasDefaultValue(0m, "DF_Products_UnitPrice");
@@ -160,7 +160,7 @@ public partial class NorthwindOriginalContext : DbContext
 
         modelBuilder.Entity<Region>(entity =>
         {
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            //entity.HasQueryFilter(e => !e.IsDeleted);
 
             entity.HasKey(e => e.RegionID).IsClustered(false);
 
@@ -170,14 +170,14 @@ public partial class NorthwindOriginalContext : DbContext
 
         modelBuilder.Entity<Shipper>(entity =>
         {
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            //entity.HasQueryFilter(e => !e.IsDeleted);
 
             entity.HasOne(d => d.Region).WithMany(p => p.Shippers).HasConstraintName("FK_Shippers_Region");
         });
 
         modelBuilder.Entity<Territory>(entity =>
         {
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            //entity.HasQueryFilter(e => !e.IsDeleted);
 
             entity.HasKey(e => e.TerritoryID).IsClustered(false);
 

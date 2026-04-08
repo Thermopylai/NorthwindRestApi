@@ -12,5 +12,6 @@ namespace NorthwindRestApi.Services.Interfaces
         Task<SupplierReadDto> CreateAsync(SupplierCreateDto dto, CancellationToken ct);
         Task<SupplierReadDto?> UpdateAsync(int id, SupplierUpdateDto dto, CancellationToken ct);
         Task<bool> DeleteAsync(int id, CancellationToken ct);
+        Task<bool> RestoreAsync(int id, CancellationToken ct);
     }
 }

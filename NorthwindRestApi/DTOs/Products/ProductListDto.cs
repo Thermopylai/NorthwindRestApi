@@ -28,6 +28,9 @@ namespace NorthwindRestApi.DTOs.Products
         public decimal? PriceWithVat { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal? StockValue { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal? StockValueWithVat { get; set; }
     }
 }

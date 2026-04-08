@@ -23,7 +23,7 @@ namespace NorthwindRestApi.Controllers
             _service = service;
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
         [HttpGet]
         [ProducesResponseType(typeof(List<CustomerListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<CustomerListDto>>> GetAll(CancellationToken ct)
@@ -32,7 +32,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(customers);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(CustomerReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -46,7 +46,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(customer);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<CustomerListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<CustomerListDto>>> GetPaged(
@@ -58,7 +58,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<CustomerListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -72,7 +72,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
+        /[Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
         [HttpPost]
         [ProducesResponseType(typeof(CustomerReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<CustomerReadDto>> Create(CustomerCreateDto dto, CancellationToken ct)
@@ -82,7 +82,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.CustomerID }, created);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CustomerReadDto), StatusCodes.Status200OK)]
@@ -96,7 +96,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -109,6 +109,19 @@ namespace NorthwindRestApi.Controllers
 
             return NoContent();
         }
-    }
 
+        //[Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
+        [HttpPost("{id}/restore")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Restore(string id, CancellationToken ct)
+        {
+            var success = await _service.RestoreAsync(id, ct);
+
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+    }
 }

@@ -122,6 +122,14 @@ namespace NorthwindRestApi.Services
             return affected > 0;
         }
 
+        public async Task<bool> RestoreAsync(int id, CancellationToken ct)
+        {
+            var affected = await _db.Suppliers
+                .Where(c => c.SupplierID == id)
+                .ExecuteUpdateAsync(u => u.SetProperty(c => c.IsDeleted, false), ct);
+            return affected > 0;
+        }
+
         private IQueryable<SupplierListDto> BuildSupplierListQuery()
         {
             return SupplierListProjections.Build(

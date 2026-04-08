@@ -27,7 +27,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(categories);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadCategories)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadCategories)]
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(CategoryReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -41,7 +41,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(category);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadCategories)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadCategories)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<CategoryListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<CategoryListDto>>> GetPaged(
@@ -53,7 +53,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadCategories)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadCategories)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<CategoryListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -69,7 +69,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageCategories)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageCategories)]
         [HttpPost]
         [ProducesResponseType(typeof(CategoryReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<CategoryReadDto>> Create(CategoryCreateDto dto, CancellationToken ct)
@@ -79,7 +79,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.CategoryID }, created);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageCategories)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageCategories)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(CategoryReadDto), StatusCodes.Status200OK)]
@@ -93,13 +93,27 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageCategories)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageCategories)]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var success = await _service.DeleteAsync(id, ct);
+
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        //[Authorize(Policy = AuthorizationPolicies.CanManageCategories)]
+        [HttpPost("{id:int}/restore")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Restore(int id, CancellationToken ct)
+        {
+            var success = await _service.RestoreAsync(id, ct);
 
             if (!success)
                 return NotFound();

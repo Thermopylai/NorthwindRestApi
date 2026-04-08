@@ -97,6 +97,14 @@ namespace NorthwindRestApi.Services
             return affected > 0;
         }
 
+        public async Task<bool> RestoreAsync(string id, CancellationToken ct)
+        {
+            var affected = await _db.Territories
+                .Where(p => p.TerritoryID == id)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.IsDeleted, false), ct);
+            return affected > 0;
+        }
+
         private IQueryable<TerritoryReadDto> BuildTerritoryReadQuery()
         {
             return TerritoryReadProjections.Build(

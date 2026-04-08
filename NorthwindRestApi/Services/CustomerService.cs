@@ -119,6 +119,16 @@ namespace NorthwindRestApi.Services
 
             return affected > 0;
         }
+        
+        public async Task<bool> RestoreAsync(string id, CancellationToken ct)
+        {
+            var affected = await _db.Customers
+                .Where(c => c.CustomerID == id)
+                .ExecuteUpdateAsync(u => u.SetProperty(c => c.IsDeleted, false), ct);
+
+            return affected > 0;
+        }
+
         private IQueryable<CustomerListDto> BuildCustomerListQuery()
         {
             return CustomerListProjections.Build(_db.Customers.AsNoTracking());

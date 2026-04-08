@@ -107,6 +107,14 @@ namespace NorthwindRestApi.Services
             return affected > 0;
         }
 
+        public async Task<bool> RestoreAsync(int id, CancellationToken ct)
+        {
+            var affected = await _db.Shippers
+                .Where(p => p.ShipperID == id)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.IsDeleted, false), ct);
+            return affected > 0;
+        }
+
         private IQueryable<ShipperListDto> BuildShipperListQuery()
         {
             return ShipperListProjections.Build(
@@ -120,6 +128,5 @@ namespace NorthwindRestApi.Services
                 OrderReadProjections.Build(
                     _db.Orders.AsNoTracking()));
         }
-
     }
 }

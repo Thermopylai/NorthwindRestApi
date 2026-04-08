@@ -17,7 +17,7 @@ namespace NorthwindRestApi.Controllers
             _service = service;
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
         [HttpGet]
         [ProducesResponseType(typeof(List<EmployeeListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<EmployeeListDto>>> GetAll(CancellationToken ct)
@@ -26,7 +26,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(employees);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(EmployeeReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -40,7 +40,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(employee);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<EmployeeListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<EmployeeListDto>>> GetPaged(
@@ -52,7 +52,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
+        //[Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<EmployeeListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -73,7 +73,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageEmployees)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageEmployees)]
         [HttpPost]
         [ProducesResponseType(typeof(EmployeeReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<EmployeeReadDto>> Create(EmployeeCreateDto dto, CancellationToken ct)
@@ -83,7 +83,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.EmployeeID }, created);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageEmployees)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageEmployees)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(EmployeeReadDto), StatusCodes.Status200OK)]
@@ -97,13 +97,27 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.CanManageEmployees)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageEmployees)]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var success = await _service.DeleteAsync(id, ct);
+
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        //[Authorize(Policy = AuthorizationPolicies.CanManageEmployees)]
+        [HttpPost("{id:int}/restore")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Restore(int id, CancellationToken ct)
+        {
+            var success = await _service.RestoreAsync(id, ct);
 
             if (!success)
                 return NotFound();

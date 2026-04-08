@@ -114,6 +114,15 @@ namespace NorthwindRestApi.Services
             return affected > 0;
         }
 
+        public async Task<bool> RestoreAsync(int id, CancellationToken ct)
+        {
+            var affected = await _db.Categories
+                .Where(c => c.CategoryID == id)
+                .ExecuteUpdateAsync(u => u.SetProperty(c => c.IsDeleted, false), ct);
+
+            return affected > 0;
+        }
+
         private IQueryable<CategoryListDto> BuildCategoryListQuery()
         {
             return CategoryListProjections.Build(

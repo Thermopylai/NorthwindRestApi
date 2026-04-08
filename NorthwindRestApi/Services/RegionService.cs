@@ -111,6 +111,14 @@ namespace NorthwindRestApi.Services
             return affected > 0;
         }
 
+        public async Task<bool> RestoreAsync(int id, CancellationToken ct)
+        {
+            var affected = await _db.Regions
+                .Where(p => p.RegionID == id)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.IsDeleted, false), ct);
+            return affected > 0;
+        }
+
         private IQueryable<RegionListDto> BuildRegionListQuery()
         {
             return RegionListProjections.Build(

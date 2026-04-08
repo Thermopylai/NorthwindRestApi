@@ -134,6 +134,14 @@ namespace NorthwindRestApi.Services
             return affected > 0;
         }
 
+        public async Task<bool> RestoreAsync(int id, CancellationToken ct)
+        {
+            var affected = await _db.Products
+                .Where(p => p.ProductID == id)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Discontinued, false), ct);
+            return affected > 0;
+        }
+
         private IQueryable<ProductListDto> BuildProductListQuery()
         {
             return ProductListProjections.Build(
