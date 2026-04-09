@@ -59,6 +59,36 @@ namespace NorthwindRestApi.Extensions
                 query = query.Where(o => o.IsDeleted == parameters.IsDeleted.Value);
             }
 
+            if (parameters.MinTotal.HasValue)
+            {
+                query = query.Where(o =>
+                    o.TotalAmount.HasValue &&
+                    o.TotalAmount.Value >= parameters.MinTotal.Value);
+            }
+
+            if (parameters.MaxTotal.HasValue)
+            {
+                query = query.Where(o =>
+                    o.TotalAmount.HasValue &&
+                    o.TotalAmount.Value <= parameters.MaxTotal.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(parameters.ShipCountry))
+            {
+                var country = parameters.ShipCountry.Trim();
+                query = query.Where(o =>
+                    o.ShipCountry != null &&
+                    o.ShipCountry.Contains(country));
+            }
+
+            if (!string.IsNullOrWhiteSpace(parameters.ShipCity))
+            {
+                var city = parameters.ShipCity.Trim();
+                query = query.Where(o =>
+                    o.ShipCity != null &&
+                    o.ShipCity.Contains(city));
+            }
+
             return query;
         }
 

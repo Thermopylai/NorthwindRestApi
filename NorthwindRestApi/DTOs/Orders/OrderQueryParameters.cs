@@ -10,6 +10,10 @@
         public DateTime? End { get; set; }
         public int? ShipVia { get; set; }
         public bool? IsDeleted { get; set; }
+        public decimal? MinTotal { get; set; }
+        public decimal? MaxTotal { get; set; }
+        public string? ShipCountry { get; set; }
+        public string? ShipCity { get; set; }
 
         // Search parameter
         public string? SearchTerm { get; set; }

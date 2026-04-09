@@ -32,6 +32,7 @@ namespace NorthwindRestApi.Projections
                     o.IsDeleted,
 
                     OrderDetails = o.Order_Details
+                        .Where(od => !od.IsDeleted)
                         .Select(od => new
                         {
                             od.OrderID,

@@ -72,7 +72,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        /[Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
+        //[Authorize(Policy = AuthorizationPolicies.CanManageCustomers)]
         [HttpPost]
         [ProducesResponseType(typeof(CustomerReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<CustomerReadDto>> Create(CustomerCreateDto dto, CancellationToken ct)
