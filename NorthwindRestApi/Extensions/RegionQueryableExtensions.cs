@@ -5,8 +5,8 @@ namespace NorthwindRestApi.Extensions
 {
     public static class RegionQueryableExtensions
     {
-        public static IQueryable<RegionListDto> ApplyFilter(
-                this IQueryable<RegionListDto> query,
+        public static IQueryable<RegionReadDto> ApplyFilter(
+                this IQueryable<RegionReadDto> query,
                 RegionQueryParameters parameters)
         {
             query = query.IgnoreQueryFilters();
@@ -19,8 +19,8 @@ namespace NorthwindRestApi.Extensions
             return query;
         }
 
-        public static IQueryable<RegionListDto> ApplySearch(
-            this IQueryable<RegionListDto> query,
+        public static IQueryable<RegionReadDto> ApplySearch(
+            this IQueryable<RegionReadDto> query,
             string? searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -32,8 +32,8 @@ namespace NorthwindRestApi.Extensions
                 (c.RegionDescription != null && c.RegionDescription.Contains(term)));
         }
 
-        public static IQueryable<RegionListDto> ApplySorting(
-            this IQueryable<RegionListDto> query,
+        public static IQueryable<RegionReadDto> ApplySorting(
+            this IQueryable<RegionReadDto> query,
             string? orderBy,
             bool descending)
         {

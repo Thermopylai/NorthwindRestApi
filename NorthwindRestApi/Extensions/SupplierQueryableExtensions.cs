@@ -5,8 +5,8 @@ namespace NorthwindRestApi.Extensions
 {
     public static class SupplierQueryableExtensions
     {
-        public static IQueryable<SupplierListDto> ApplyFilter(
-                this IQueryable<SupplierListDto> query,
+        public static IQueryable<SupplierReadDto> ApplyFilter(
+                this IQueryable<SupplierReadDto> query,
                 SupplierQueryParameters parameters)
         {
             query = query.IgnoreQueryFilters();
@@ -19,8 +19,8 @@ namespace NorthwindRestApi.Extensions
             return query;
         }
 
-        public static IQueryable<SupplierListDto> ApplySearch(
-            this IQueryable<SupplierListDto> query,
+        public static IQueryable<SupplierReadDto> ApplySearch(
+            this IQueryable<SupplierReadDto> query,
             string? searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -42,8 +42,8 @@ namespace NorthwindRestApi.Extensions
                 (s.HomePage != null && s.HomePage.Contains(term)));
         }
 
-        public static IQueryable<SupplierListDto> ApplySorting(
-            this IQueryable<SupplierListDto> query,
+        public static IQueryable<SupplierReadDto> ApplySorting(
+            this IQueryable<SupplierReadDto> query,
             string? orderBy,
             bool descending)
         {

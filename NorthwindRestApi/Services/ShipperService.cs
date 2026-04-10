@@ -33,21 +33,21 @@ namespace NorthwindRestApi.Services
                 .FirstOrDefaultAsync(s => s.ShipperID == id, ct);
         }
 
-        public async Task<PagedResult<ShipperListDto>> GetPagedAsync(
+        public async Task<PagedResult<ShipperReadDto>> GetPagedAsync(
             int page, 
             int pageSize, 
             CancellationToken ct)
         {
-            return await BuildShipperListQuery()
+            return await BuildShipperReadQuery()
                 .OrderBy(s => s.ShipperID)
                 .ToPagedResultAsync(page, pageSize, ct);
         }
 
-        public async Task<PagedResult<ShipperListDto>> SearchAsync(
+        public async Task<PagedResult<ShipperReadDto>> SearchAsync(
             ShipperQueryParameters parameters, 
             CancellationToken ct)
         {
-            var query = BuildShipperListQuery()
+            var query = BuildShipperReadQuery()
                 .ApplyFilter(parameters)
                 .ApplySearch(parameters.SearchTerm)
                 .ApplySorting(parameters.OrderBy, parameters.Descending);

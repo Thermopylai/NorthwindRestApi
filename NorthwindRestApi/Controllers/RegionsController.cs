@@ -43,8 +43,8 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
         [HttpGet("paged")]
-        [ProducesResponseType(typeof(PagedResult<RegionListDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<RegionListDto>>> GetPaged(
+        [ProducesResponseType(typeof(PagedResult<RegionReadDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<RegionReadDto>>> GetPaged(
             CancellationToken ct,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
@@ -55,9 +55,9 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadRegions)]
         [HttpGet("search")]
-        [ProducesResponseType(typeof(PagedResult<RegionListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedResult<RegionReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PagedResult<RegionListDto>>> Search(
+        public async Task<ActionResult<PagedResult<RegionReadDto>>> Search(
             [FromQuery] RegionQueryParameters parameters,
             CancellationToken ct)
         {

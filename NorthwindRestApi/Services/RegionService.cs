@@ -33,21 +33,21 @@ namespace NorthwindRestApi.Services
                 .FirstOrDefaultAsync(r => r.RegionID == id, ct);
         }
 
-        public async Task<PagedResult<RegionListDto>> GetPagedAsync(
+        public async Task<PagedResult<RegionReadDto>> GetPagedAsync(
             int page, 
             int pageSize, 
             CancellationToken ct)
         {
-            return await BuildRegionListQuery()
+            return await BuildRegionReadQuery()
                 .OrderBy(r => r.RegionID)
                 .ToPagedResultAsync(page, pageSize, ct);
         }
 
-        public async Task<PagedResult<RegionListDto>> SearchAsync(
+        public async Task<PagedResult<RegionReadDto>> SearchAsync(
             RegionQueryParameters parameters,
             CancellationToken ct)
         {
-            var query = BuildRegionListQuery()
+            var query = BuildRegionReadQuery()
                 .ApplyFilter(parameters)
                 .ApplySearch(parameters.SearchTerm)
                 .ApplySorting(parameters.OrderBy, parameters.Descending);

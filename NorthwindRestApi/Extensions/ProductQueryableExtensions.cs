@@ -14,8 +14,8 @@ namespace NorthwindRestApi.Extensions
         /// <param name="query"></param>
         /// <param name="parameters"></param>
         /// <returns>An IQueryable containing only the products that match all of the specified filter parameters.</returns>
-        public static IQueryable<ProductListDto> ApplyFilter(
-            this IQueryable<ProductListDto> query,
+        public static IQueryable<ProductReadDto> ApplyFilter(
+            this IQueryable<ProductReadDto> query,
             ProductQueryParameters parameters)
         {
             query = query.IgnoreQueryFilters();
@@ -79,8 +79,8 @@ namespace NorthwindRestApi.Extensions
         /// <param name="query">The source query of products to filter.</param>
         /// <param name="searchTerm">The search term to match against product fields. If null or whitespace, no filtering is applied.</param>
         /// <returns>An IQueryable containing products that match the search term in any of the specified fields.</returns>
-        public static IQueryable<ProductListDto> ApplySearch(
-            this IQueryable<ProductListDto> query,
+        public static IQueryable<ProductReadDto> ApplySearch(
+            this IQueryable<ProductReadDto> query,
             string? searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -111,8 +111,8 @@ namespace NorthwindRestApi.Extensions
         /// <param name="descending">A value indicating whether to sort in descending order. If <see langword="true"/>, the results are sorted in
         /// descending order; otherwise, in ascending order.</param>
         /// <returns>An IQueryable of ProductReadDto items sorted according to the specified property and direction.</returns>
-        public static IQueryable<ProductListDto> ApplySorting(
-            this IQueryable<ProductListDto> query,
+        public static IQueryable<ProductReadDto> ApplySorting(
+            this IQueryable<ProductReadDto> query,
             string? orderBy,
             bool descending)
         {

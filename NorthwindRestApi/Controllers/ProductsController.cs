@@ -44,9 +44,9 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
         [HttpGet("by-category/{categoryId:int}")]
-        [ProducesResponseType(typeof(List<ProductListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ProductReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<ProductListDto>>> GetByCategoryId(int categoryId, CancellationToken ct)
+        public async Task<ActionResult<List<ProductReadDto>>> GetByCategoryId(int categoryId, CancellationToken ct)
         {
             var products = await _service.GetByCategoryIdAsync(categoryId, ct);
 
@@ -58,8 +58,8 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
         [HttpGet("paged")]
-        [ProducesResponseType(typeof(PagedResult<ProductListDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<ProductListDto>>> GetPaged(
+        [ProducesResponseType(typeof(PagedResult<ProductReadDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<ProductReadDto>>> GetPaged(
             CancellationToken ct,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10
@@ -71,10 +71,10 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadProducts)]
         [HttpGet("search")]
-        [ProducesResponseType(typeof(PagedResult<ProductListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedResult<ProductReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PagedResult<ProductListDto>>> Search([FromQuery] ProductQueryParameters parameters, CancellationToken ct)
+        public async Task<ActionResult<PagedResult<ProductReadDto>>> Search([FromQuery] ProductQueryParameters parameters, CancellationToken ct)
         {
             if (parameters.MinPrice.HasValue && parameters.MaxPrice.HasValue &&
                 parameters.MaxPrice.Value < parameters.MinPrice.Value)
@@ -103,8 +103,8 @@ namespace NorthwindRestApi.Controllers
         //[Authorize(Policy = AuthorizationPolicies.CanManageProducts)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(PagedResult<ProductReadDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Update(int id, ProductUpdateDto dto, CancellationToken ct)
+        [ProducesResponseType(typeof(ProductReadDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<ProductReadDto>> Update(int id, ProductUpdateDto dto, CancellationToken ct)
         {
             var updated = await _service.UpdateAsync(id, dto, ct);
 

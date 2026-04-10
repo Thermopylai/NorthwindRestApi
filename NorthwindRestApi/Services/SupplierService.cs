@@ -32,21 +32,21 @@ namespace NorthwindRestApi.Services
                 .FirstOrDefaultAsync(s => s.SupplierID == id, ct);
         }
 
-        public async Task<PagedResult<SupplierListDto>> GetPagedAsync(
+        public async Task<PagedResult<SupplierReadDto>> GetPagedAsync(
             int page, 
             int pageSize, 
             CancellationToken ct)
         {
-            return await BuildSupplierListQuery()
+            return await BuildSupplierReadQuery()
                 .OrderBy(s => s.SupplierID)
                 .ToPagedResultAsync(page, pageSize, ct);
         }
 
-        public async Task<PagedResult<SupplierListDto>> SearchAsync(
+        public async Task<PagedResult<SupplierReadDto>> SearchAsync(
             SupplierQueryParameters parameters, 
             CancellationToken ct)
         {
-            var query = BuildSupplierListQuery()
+            var query = BuildSupplierReadQuery()
                 .ApplyFilter(parameters)
                 .ApplySearch(parameters.SearchTerm)
                 .ApplySorting(parameters.OrderBy, parameters.Descending);

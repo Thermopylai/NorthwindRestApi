@@ -5,8 +5,8 @@ namespace NorthwindRestApi.Extensions
 {
     public static class ShipperQueryableExtensions
     {
-        public static IQueryable<ShipperListDto> ApplyFilter(
-                this IQueryable<ShipperListDto> query,
+        public static IQueryable<ShipperReadDto> ApplyFilter(
+                this IQueryable<ShipperReadDto> query,
                 ShipperQueryParameters parameters)
         {
             query = query.IgnoreQueryFilters();
@@ -24,8 +24,8 @@ namespace NorthwindRestApi.Extensions
             return query;
         }
 
-        public static IQueryable<ShipperListDto> ApplySearch(
-            this IQueryable<ShipperListDto> query,
+        public static IQueryable<ShipperReadDto> ApplySearch(
+            this IQueryable<ShipperReadDto> query,
             string? searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -39,8 +39,8 @@ namespace NorthwindRestApi.Extensions
                 (c.RegionDescription != null && c.RegionDescription.Contains(term)));
         }
 
-        public static IQueryable<ShipperListDto> ApplySorting(
-            this IQueryable<ShipperListDto> query,
+        public static IQueryable<ShipperReadDto> ApplySorting(
+            this IQueryable<ShipperReadDto> query,
             string? orderBy,
             bool descending)
         {

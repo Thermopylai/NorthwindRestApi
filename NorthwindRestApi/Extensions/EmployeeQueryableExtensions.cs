@@ -7,8 +7,8 @@ namespace NorthwindRestApi.Extensions
 {
     public static class EmployeeQueryableExtensions
     {
-        public static IQueryable<EmployeeListDto> ApplyFilter(
-            this IQueryable<EmployeeListDto> query,
+        public static IQueryable<EmployeeReadDto> ApplyFilter(
+            this IQueryable<EmployeeReadDto> query,
             EmployeeQueryParameters parameters)
         {
             query = query.IgnoreQueryFilters();
@@ -47,8 +47,8 @@ namespace NorthwindRestApi.Extensions
 
             return query;
         }
-        public static IQueryable<EmployeeListDto> ApplySearch(
-            this IQueryable<EmployeeListDto> query,
+        public static IQueryable<EmployeeReadDto> ApplySearch(
+            this IQueryable<EmployeeReadDto> query,
             string? searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -71,8 +71,8 @@ namespace NorthwindRestApi.Extensions
                 (e.ReportsToFullName != null && e.ReportsToFullName.Contains(term)));
         }
 
-        public static IQueryable<EmployeeListDto> ApplySorting(
-            this IQueryable<EmployeeListDto> query,
+        public static IQueryable<EmployeeReadDto> ApplySorting(
+            this IQueryable<EmployeeReadDto> query,
             string? orderBy,
             bool descending)
         {

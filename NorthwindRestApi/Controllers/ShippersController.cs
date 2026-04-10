@@ -44,8 +44,8 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
         [HttpGet("paged")]
-        [ProducesResponseType(typeof(PagedResult<ShipperListDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<ShipperListDto>>> GetPaged(
+        [ProducesResponseType(typeof(PagedResult<ShipperReadDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<ShipperReadDto>>> GetPaged(
             CancellationToken ct,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
@@ -56,9 +56,9 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
         [HttpGet("search")]
-        [ProducesResponseType(typeof(PagedResult<ShipperListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedResult<ShipperReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PagedResult<ShipperListDto>>> Search(
+        public async Task<ActionResult<PagedResult<ShipperReadDto>>> Search(
             [FromQuery] ShipperQueryParameters parameters,
             CancellationToken ct)
         {

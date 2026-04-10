@@ -20,8 +20,8 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadOrders)]
         [HttpGet]
-        [ProducesResponseType(typeof(List<OrderReadDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<OrderReadDto>>> GetAll(CancellationToken ct)
+        [ProducesResponseType(typeof(List<OrderListDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<OrderListDto>>> GetAll(CancellationToken ct)
         {
             var orders = await _service.GetAllAsync(ct);
             return Ok(orders);
@@ -43,9 +43,9 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadOrders)]
         [HttpGet("by-customer/{customerId}")]
-        [ProducesResponseType(typeof(List<OrderListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<OrderReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<OrderListDto>>> GetByCustomerId(string customerId, CancellationToken ct)
+        public async Task<ActionResult<List<OrderReadDto>>> GetByCustomerId(string customerId, CancellationToken ct)
         {
             var orders = await _service.GetByCustomerIdAsync(customerId, ct);
 
@@ -57,10 +57,10 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadOrders)]
         [HttpGet("by-date-range")]
-        [ProducesResponseType(typeof(List<OrderListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<OrderReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<OrderListDto>>> GetByDateRange(
+        public async Task<ActionResult<List<OrderReadDto>>> GetByDateRange(
             [FromQuery] DateTime start,
             [FromQuery] DateTime end,
             CancellationToken ct)
@@ -78,8 +78,8 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadOrders)]
         [HttpGet("paged")]
-        [ProducesResponseType(typeof(PagedResult<OrderListDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<OrderListDto>>> GetPaged(
+        [ProducesResponseType(typeof(PagedResult<OrderReadDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<OrderReadDto>>> GetPaged(
             CancellationToken ct,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
@@ -122,8 +122,8 @@ namespace NorthwindRestApi.Controllers
         //[Authorize(Policy = AuthorizationPolicies.CanManageOrders)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(PagedResult<OrderReadDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Update(int id, OrderUpdateDto dto, CancellationToken ct)
+        [ProducesResponseType(typeof(OrderReadDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<OrderReadDto>> Update(int id, OrderUpdateDto dto, CancellationToken ct)
         {
             var updated = await _service.UpdateAsync(id, dto, ct);
 

@@ -33,21 +33,21 @@ namespace NorthwindRestApi.Services
                 .FirstOrDefaultAsync(c => c.CategoryID == id, ct);
         }
 
-        public async Task<PagedResult<CategoryListDto>> GetPagedAsync(
+        public async Task<PagedResult<CategoryReadDto>> GetPagedAsync(
             int page, 
             int pageSize, 
             CancellationToken ct)
         {
-            return await BuildCategoryListQuery()
+            return await BuildCategoryReadQuery()
                 .OrderBy(o => o.CategoryID)
                 .ToPagedResultAsync(page, pageSize, ct);
         }
 
-        public async Task<PagedResult<CategoryListDto>> SearchAsync(
+        public async Task<PagedResult<CategoryReadDto>> SearchAsync(
             CategoryQueryParameters parameters, 
             CancellationToken ct)
         {
-            var query = BuildCategoryListQuery()
+            var query = BuildCategoryReadQuery()
                 .ApplyFilter(parameters)
                 .ApplySearch(parameters.SearchTerm)
                 .ApplySorting(parameters.OrderBy, parameters.Descending);

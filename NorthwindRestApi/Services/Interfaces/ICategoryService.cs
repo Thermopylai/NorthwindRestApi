@@ -7,8 +7,8 @@ namespace NorthwindRestApi.Services.Interfaces
     {
         Task<List<CategoryListDto>> GetAllAsync(CancellationToken ct);
         Task<CategoryReadDto?> GetByIdAsync(int id, CancellationToken ct);
-        Task<PagedResult<CategoryListDto>> GetPagedAsync(int page, int pageSize, CancellationToken ct);
-        Task<PagedResult<CategoryListDto>> SearchAsync(CategoryQueryParameters parameters, CancellationToken ct);
+        Task<PagedResult<CategoryReadDto>> GetPagedAsync(int page, int pageSize, CancellationToken ct);
+        Task<PagedResult<CategoryReadDto>> SearchAsync(CategoryQueryParameters parameters, CancellationToken ct);
         Task<CategoryReadDto> CreateAsync(CategoryCreateDto dto, CancellationToken ct);
         Task<CategoryReadDto?> UpdateAsync(int id, CategoryUpdateDto dto, CancellationToken ct);
         Task<bool> DeleteAsync(int id, CancellationToken ct);

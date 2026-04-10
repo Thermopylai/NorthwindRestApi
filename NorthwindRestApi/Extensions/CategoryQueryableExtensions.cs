@@ -5,8 +5,8 @@ namespace NorthwindRestApi.Extensions
 {
     public static class CategoryQueryableExtensions
     {
-        public static IQueryable<CategoryListDto> ApplyFilter(
-                this IQueryable<CategoryListDto> query,
+        public static IQueryable<CategoryReadDto> ApplyFilter(
+                this IQueryable<CategoryReadDto> query,
                 CategoryQueryParameters parameters)
         {
             query = query.IgnoreQueryFilters();
@@ -19,8 +19,8 @@ namespace NorthwindRestApi.Extensions
             return query;
         }
 
-        public static IQueryable<CategoryListDto> ApplySearch(
-            this IQueryable<CategoryListDto> query,
+        public static IQueryable<CategoryReadDto> ApplySearch(
+            this IQueryable<CategoryReadDto> query,
             string? searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -33,8 +33,8 @@ namespace NorthwindRestApi.Extensions
                 (c.Description != null && c.Description.Contains(term)));
         }
 
-        public static IQueryable<CategoryListDto> ApplySorting(
-            this IQueryable<CategoryListDto> query,
+        public static IQueryable<CategoryReadDto> ApplySorting(
+            this IQueryable<CategoryReadDto> query,
             string? orderBy,
             bool descending)
         {

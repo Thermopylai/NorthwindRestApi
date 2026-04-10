@@ -34,21 +34,21 @@ namespace NorthwindRestApi.Services
                 .FirstOrDefaultAsync(e => e.EmployeeID == id, ct);
         }
 
-        public async Task<PagedResult<EmployeeListDto>> GetPagedAsync(
+        public async Task<PagedResult<EmployeeReadDto>> GetPagedAsync(
             int page, 
             int pageSize, 
             CancellationToken ct)
         {
-            return await BuildEmployeeListQuery()
+            return await BuildEmployeeReadQuery()
                 .OrderBy(e => e.EmployeeID)
                 .ToPagedResultAsync(page, pageSize, ct);
         }
 
-        public async Task<PagedResult<EmployeeListDto>> SearchAsync(
+        public async Task<PagedResult<EmployeeReadDto>> SearchAsync(
             EmployeeQueryParameters parameters, 
             CancellationToken ct)
         {
-            var query = BuildEmployeeListQuery()
+            var query = BuildEmployeeReadQuery()
                 .ApplyFilter(parameters)
                 .ApplySearch(parameters.SearchTerm)
                 .ApplySorting(parameters.OrderBy, parameters.Descending);

@@ -5,8 +5,8 @@ namespace NorthwindRestApi.Extensions
 {
     public static class CustomerQueryableExtensions
     {
-        public static IQueryable<CustomerListDto> ApplyFilter(
-                this IQueryable<CustomerListDto> query,
+        public static IQueryable<CustomerReadDto> ApplyFilter(
+                this IQueryable<CustomerReadDto> query,
                 CustomerQueryParameters parameters)
         {
             query = query.IgnoreQueryFilters();
@@ -37,8 +37,8 @@ namespace NorthwindRestApi.Extensions
             return query;
         }
 
-        public static IQueryable<CustomerListDto> ApplySearch(
-            this IQueryable<CustomerListDto> query,
+        public static IQueryable<CustomerReadDto> ApplySearch(
+            this IQueryable<CustomerReadDto> query,
             string? searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -60,8 +60,8 @@ namespace NorthwindRestApi.Extensions
                 (c.Fax != null && c.Fax.Contains(term)));
         }
 
-        public static IQueryable<CustomerListDto> ApplySorting(
-            this IQueryable<CustomerListDto> query,
+        public static IQueryable<CustomerReadDto> ApplySorting(
+            this IQueryable<CustomerReadDto> query,
             string? orderBy,
             bool descending)
         {

@@ -32,29 +32,29 @@ namespace NorthwindRestApi.Services
                 .FirstOrDefaultAsync(p => p.ProductID == id, ct);
         }
 
-        public async Task<List<ProductListDto>> GetByCategoryIdAsync(int categoryId, CancellationToken ct)
+        public async Task<List<ProductReadDto>> GetByCategoryIdAsync(int categoryId, CancellationToken ct)
         {
-            return await BuildProductListQuery()
+            return await BuildProductReadQuery()
                 .Where(p => p.CategoryID == categoryId)
                 .OrderBy(p => p.ProductID)
                 .ToListAsync(ct);
         }
 
-        public async Task<PagedResult<ProductListDto>> GetPagedAsync(
+        public async Task<PagedResult<ProductReadDto>> GetPagedAsync(
             int page, 
             int pageSize, 
             CancellationToken ct)
         {           
-            return await BuildProductListQuery()
+            return await BuildProductReadQuery()
                 .OrderBy(p => p.ProductID)
                 .ToPagedResultAsync(page, pageSize, ct);
         }
 
-        public async Task<PagedResult<ProductListDto>> SearchAsync(
+        public async Task<PagedResult<ProductReadDto>> SearchAsync(
             ProductQueryParameters parameters, 
             CancellationToken ct)
         {
-            var query = BuildProductListQuery()
+            var query = BuildProductReadQuery()
                 .ApplyFilter(parameters)
                 .ApplySearch(parameters.SearchTerm)
                 .ApplySorting(parameters.OrderBy, parameters.Descending);

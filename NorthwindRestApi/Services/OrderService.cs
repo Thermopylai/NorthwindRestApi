@@ -19,9 +19,9 @@ namespace NorthwindRestApi.Services
             _db = db;
         }
 
-        public async Task<List<OrderReadDto>> GetAllAsync(CancellationToken ct)
+        public async Task<List<OrderListDto>> GetAllAsync(CancellationToken ct)
         {
-            return await BuildOrderReadQuery()
+            return await BuildOrderListQuery()
                 .OrderBy(o => o.OrderID)
                 .ToListAsync(ct);
         }
@@ -32,21 +32,21 @@ namespace NorthwindRestApi.Services
                 .FirstOrDefaultAsync(o => o.OrderID == id, ct);
         }
 
-        public async Task<List<OrderListDto>> GetByCustomerIdAsync(string customerId, CancellationToken ct)
+        public async Task<List<OrderReadDto>> GetByCustomerIdAsync(string customerId, CancellationToken ct)
         {
-            return await BuildOrderListQuery()
+            return await BuildOrderReadQuery()
                 .Where(o => o.CustomerID == customerId)
                 .OrderByDescending(o => o.OrderDate)
                 .ThenByDescending(o => o.OrderID)
                 .ToListAsync(ct);
         }
 
-        public async Task<List<OrderListDto>> GetByDateRangeAsync(DateTime start, DateTime end, CancellationToken ct)
+        public async Task<List<OrderReadDto>> GetByDateRangeAsync(DateTime start, DateTime end, CancellationToken ct)
         {
             var startDate = DateTime.SpecifyKind(start.Date, DateTimeKind.Unspecified);
             var endDateExclusive = DateTime.SpecifyKind(end.Date.AddDays(1), DateTimeKind.Unspecified);
 
-            return await BuildOrderListQuery()
+            return await BuildOrderReadQuery()
                 .Where(o => o.OrderDate.HasValue &&
                             o.OrderDate.Value >= startDate &&
                             o.OrderDate.Value < endDateExclusive)
@@ -55,12 +55,12 @@ namespace NorthwindRestApi.Services
                 .ToListAsync(ct);
         }
 
-        public async Task<PagedResult<OrderListDto>> GetPagedAsync(
+        public async Task<PagedResult<OrderReadDto>> GetPagedAsync(
             int page, 
             int pageSize, 
             CancellationToken ct)
         {
-            return await BuildOrderListQuery()
+            return await BuildOrderReadQuery()
                 .OrderBy(o => o.OrderID)
                 .ToPagedResultAsync(page, pageSize, ct);
         }

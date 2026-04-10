@@ -5,11 +5,11 @@ namespace NorthwindRestApi.Services.Interfaces
 {
     public interface IOrderService
     {
-        Task<List<OrderReadDto>> GetAllAsync(CancellationToken ct);
+        Task<List<OrderListDto>> GetAllAsync(CancellationToken ct);
         Task<OrderReadDto?> GetByIdAsync(int id, CancellationToken ct);
-        Task<List<OrderListDto>> GetByCustomerIdAsync(string customerId, CancellationToken ct);
-        Task<List<OrderListDto>> GetByDateRangeAsync(DateTime start, DateTime end, CancellationToken ct);
-        Task<PagedResult<OrderListDto>> GetPagedAsync(int page, int pageSize, CancellationToken ct);
+        Task<List<OrderReadDto>> GetByCustomerIdAsync(string customerId, CancellationToken ct);
+        Task<List<OrderReadDto>> GetByDateRangeAsync(DateTime start, DateTime end, CancellationToken ct);
+        Task<PagedResult<OrderReadDto>> GetPagedAsync(int page, int pageSize, CancellationToken ct);
         Task<PagedResult<OrderReadDto>> SearchAsync(OrderQueryParameters parameters, CancellationToken ct);
         Task<OrderReadDto> CreateAsync(OrderCreateDto dto, CancellationToken ct);
         Task<OrderReadDto?> UpdateAsync(int id, OrderUpdateDto dto, CancellationToken ct);

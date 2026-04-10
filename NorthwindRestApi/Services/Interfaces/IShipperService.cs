@@ -7,8 +7,8 @@ namespace NorthwindRestApi.Services.Interfaces
     {
         Task<List<ShipperListDto>> GetAllAsync(CancellationToken ct);
         Task<ShipperReadDto?> GetByIdAsync(int id, CancellationToken ct);
-        Task<PagedResult<ShipperListDto>> GetPagedAsync(int page, int pageSize, CancellationToken ct);
-        Task<PagedResult<ShipperListDto>> SearchAsync(ShipperQueryParameters parameters, CancellationToken ct);
+        Task<PagedResult<ShipperReadDto>> GetPagedAsync(int page, int pageSize, CancellationToken ct);
+        Task<PagedResult<ShipperReadDto>> SearchAsync(ShipperQueryParameters parameters, CancellationToken ct);
         Task<ShipperReadDto> CreateAsync(ShipperCreateDto dto, CancellationToken ct);
         Task<ShipperReadDto?> UpdateAsync(int id, ShipperUpdateDto dto, CancellationToken ct);
         Task<bool> DeleteAsync(int id, CancellationToken ct);

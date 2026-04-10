@@ -42,8 +42,8 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
         [HttpGet("paged")]
-        [ProducesResponseType(typeof(PagedResult<EmployeeListDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<EmployeeListDto>>> GetPaged(
+        [ProducesResponseType(typeof(PagedResult<EmployeeReadDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<EmployeeReadDto>>> GetPaged(
             CancellationToken ct,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
@@ -54,10 +54,10 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadEmployees)]
         [HttpGet("search")]
-        [ProducesResponseType(typeof(PagedResult<EmployeeListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedResult<EmployeeReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PagedResult<EmployeeListDto>>> Search([FromQuery] EmployeeQueryParameters parameters, CancellationToken ct)
+        public async Task<ActionResult<PagedResult<EmployeeReadDto>>> Search([FromQuery] EmployeeQueryParameters parameters, CancellationToken ct)
         {
             if (parameters.Start.HasValue && parameters.End.HasValue &&
                 parameters.End.Value.Date < parameters.Start.Value.Date)

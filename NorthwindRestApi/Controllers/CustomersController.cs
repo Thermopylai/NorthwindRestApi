@@ -48,8 +48,8 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
         [HttpGet("paged")]
-        [ProducesResponseType(typeof(PagedResult<CustomerListDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<CustomerListDto>>> GetPaged(
+        [ProducesResponseType(typeof(PagedResult<CustomerReadDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<CustomerReadDto>>> GetPaged(
             CancellationToken ct,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
@@ -60,9 +60,9 @@ namespace NorthwindRestApi.Controllers
 
         //[Authorize(Policy = AuthorizationPolicies.CanReadCustomers)]
         [HttpGet("search")]
-        [ProducesResponseType(typeof(PagedResult<CustomerListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedResult<CustomerReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PagedResult<CustomerListDto>>> Search([FromQuery] CustomerQueryParameters parameters, CancellationToken ct)
+        public async Task<ActionResult<PagedResult<CustomerReadDto>>> Search([FromQuery] CustomerQueryParameters parameters, CancellationToken ct)
         {
             var result = await _service.SearchAsync(parameters, ct);
 
