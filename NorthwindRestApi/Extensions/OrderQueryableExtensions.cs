@@ -59,6 +59,20 @@ namespace NorthwindRestApi.Extensions
                 query = query.Where(o => o.IsDeleted == parameters.IsDeleted.Value);
             }
 
+            if (parameters.MinFreight.HasValue)
+            {
+                query = query.Where(o =>
+                    o.Freight.HasValue &&
+                    o.Freight.Value >= parameters.MinFreight.Value);
+            }
+
+            if (parameters.MaxFreight.HasValue)
+            {
+                query = query.Where(o =>
+                    o.Freight.HasValue &&
+                    o.Freight.Value <= parameters.MaxFreight.Value);
+            }
+
             if (parameters.MinTotal.HasValue)
             {
                 query = query.Where(o =>

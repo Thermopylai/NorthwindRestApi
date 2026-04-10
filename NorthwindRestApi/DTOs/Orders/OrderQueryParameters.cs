@@ -10,6 +10,8 @@
         public DateTime? End { get; set; }
         public int? ShipVia { get; set; }
         public bool? IsDeleted { get; set; }
+        public decimal? MinFreight { get; set; }
+        public decimal? MaxFreight { get; set; }
         public decimal? MinTotal { get; set; }
         public decimal? MaxTotal { get; set; }
         public string? ShipCountry { get; set; }

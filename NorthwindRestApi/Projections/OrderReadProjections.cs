@@ -110,7 +110,7 @@ namespace NorthwindRestApi.Projections
                     IsDeleted = o.IsDeleted,
                     OrderDetails = o.OrderDetails,
                     OrderRowCount = o.OrderDetails.Count,
-                    TotalAmount = o.OrderDetails.Sum(od => (decimal)(od.TotalPrice ?? 0)),
+                    TotalAmount = o.OrderDetails.Sum(od => (decimal)(od.PriceWithDiscount ?? 0)),
                     TotalVatAmount = o.OrderDetails.Sum(od => od.VatAmount),
                     TotalAmountWithVat = o.OrderDetails.Sum(od => od.PriceWithVat),
                     FinalAmount = o.OrderDetails.Sum(od => od.PriceWithVat) + (o.Freight ?? 0)
