@@ -45,6 +45,13 @@ namespace NorthwindRestApi.Extensions
                 query = query.Where(p => p.ReportsTo == parameters.ReportsTo.Value);
             }
 
+            if (parameters.TerritoryID != null) 
+            {
+                var territoryId = parameters.TerritoryID.Trim();
+                query = query.Where(e =>
+                    e.Territories.Any(t => t.TerritoryID == territoryId));
+            }
+
             return query;
         }
         public static IQueryable<EmployeeReadDto> ApplySearch(

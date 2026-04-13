@@ -22,6 +22,7 @@ namespace NorthwindRestApi.Services
         {
             _db = db;
         }
+
         public async Task<List<EmployeeListDto>> GetAllAsync(CancellationToken ct)
         {
             return await BuildEmployeeListQuery()
@@ -36,8 +37,8 @@ namespace NorthwindRestApi.Services
         }
 
         public async Task<PagedResult<EmployeeReadDto>> GetPagedAsync(
-            int page, 
-            int pageSize, 
+            int page,
+            int pageSize,
             CancellationToken ct)
         {
             return await BuildEmployeeReadQuery()
@@ -46,7 +47,7 @@ namespace NorthwindRestApi.Services
         }
 
         public async Task<PagedResult<EmployeeReadDto>> SearchAsync(
-            EmployeeQueryParameters parameters, 
+            EmployeeQueryParameters parameters,
             CancellationToken ct)
         {
             var query = BuildEmployeeReadQuery()
@@ -69,6 +70,8 @@ namespace NorthwindRestApi.Services
                 imageBytes = ImageConverter.AddNorthwindPictureHeader(imageBytes);
             }
 
+            var territories = await ResolveTerritoriesAsync(dto.Territories, ct);
+
             var entity = new Employee
             {
                 LastName = dto.LastName,
@@ -89,13 +92,7 @@ namespace NorthwindRestApi.Services
                 Photo = imageBytes,
                 PhotoPath = dto.PhotoPath,
                 IsDeleted = dto.IsDeleted,
-                Territories = dto.Territories.Select(et => new Territory
-                {
-                    TerritoryID = et.TerritoryID,
-                    TerritoryDescription = et.TerritoryDescription,
-                    RegionID = et.RegionID,
-                })
-                .ToList()
+                Territories = territories
             };
 
             _db.Add(entity);
@@ -126,6 +123,8 @@ namespace NorthwindRestApi.Services
                 imageBytes = ImageConverter.AddNorthwindPictureHeader(imageBytes);
             }
 
+            var territories = await ResolveTerritoriesAsync(dto.Territories, ct);
+
             entity.LastName = dto.LastName;
             entity.FirstName = dto.FirstName;
             entity.Title = dto.Title;
@@ -144,13 +143,15 @@ namespace NorthwindRestApi.Services
             entity.Photo = imageBytes ?? entity.Photo;
             entity.PhotoPath = dto.PhotoPath;
             entity.IsDeleted = dto.IsDeleted;
-            entity.Territories = dto.Territories.Select(et => new Territory
+
+            // Update many-to-many via tracked entities (updates join table, doesn't insert Territories)
+            await _db.Entry(entity).Collection(e => e.Territories).LoadAsync(ct);
+            entity.Territories.Clear();
+            foreach (var territory in territories)
             {
-                TerritoryID = et.TerritoryID,
-                TerritoryDescription = et.TerritoryDescription,
-                RegionID = et.RegionID,
-            }).ToList();
-            
+                entity.Territories.Add(territory);
+            }
+
             await _db.SaveChangesAsync(ct);
 
             return await EmployeeReadProjections.Build(
@@ -176,6 +177,23 @@ namespace NorthwindRestApi.Services
                 .Where(c => c.EmployeeID == id)
                 .ExecuteUpdateAsync(u => u.SetProperty(c => c.IsDeleted, false), ct);
             return affected > 0;
+        }
+
+        private async Task<List<Territory>> ResolveTerritoriesAsync(IEnumerable<string> territoryIds, CancellationToken ct)
+        {
+            var ids = territoryIds
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Select(id => id.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (ids.Count == 0)
+                return new List<Territory>();
+
+            // IMPORTANT: do NOT use AsNoTracking here; we want tracked entities for relationship fixup.
+            return await _db.Territories
+                .Where(t => ids.Contains(t.TerritoryID))
+                .ToListAsync(ct);
         }
 
         private IQueryable<EmployeeListDto> BuildEmployeeListQuery()

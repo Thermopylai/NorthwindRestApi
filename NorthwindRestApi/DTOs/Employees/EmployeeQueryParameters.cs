@@ -7,6 +7,7 @@
         public DateTime? Start { get; set; }
         public DateTime? End { get; set; }
         public int? ReportsTo { get; set; }
+        public string? TerritoryID { get; set; }
 
         // Search parameter
         public string? SearchTerm { get; set; }

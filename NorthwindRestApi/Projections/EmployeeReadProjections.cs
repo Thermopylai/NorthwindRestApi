@@ -1,4 +1,5 @@
-﻿using NorthwindRestApi.DTOs.Employees;
+﻿using NorthwindRestApi.Common;
+using NorthwindRestApi.DTOs.Employees;
 using NorthwindRestApi.DTOs.Orders;
 using NorthwindRestApi.DTOs.Territories;
 using NorthwindRestApi.Models.Entities;
@@ -33,7 +34,7 @@ namespace NorthwindRestApi.Projections
                     ReportsToFullName = e.ReportsToNavigation != null
                         ? e.ReportsToNavigation.FirstName + " " + e.ReportsToNavigation.LastName
                         : null,
-                    Photo = e.Photo != null ? Convert.ToBase64String(e.Photo) : null,
+                    Photo = e.Photo != null ? ImageConverter.ConvertToBase64(e.Photo) : null,
                     PhotoPath = e.PhotoPath,
                     IsDeleted = e.IsDeleted,
                     Territories = e.Territories.Select(et => new TerritoryReadDto
