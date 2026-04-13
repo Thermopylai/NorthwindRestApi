@@ -25,6 +25,7 @@ namespace NorthwindRestApi.DTOs.Employees
         public string? Notes { get; set; }
         public int? ReportsTo { get; set; }
         public string? ReportsToFullName { get; set; }
+        public string? Photo { get; set; }
         public string? PhotoPath { get; set; }
         public bool IsDeleted { get; set; }
 

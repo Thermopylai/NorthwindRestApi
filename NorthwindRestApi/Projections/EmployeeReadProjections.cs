@@ -33,6 +33,7 @@ namespace NorthwindRestApi.Projections
                     ReportsToFullName = e.ReportsToNavigation != null
                         ? e.ReportsToNavigation.FirstName + " " + e.ReportsToNavigation.LastName
                         : null,
+                    Photo = e.Photo != null ? Convert.ToBase64String(e.Photo) : null,
                     PhotoPath = e.PhotoPath,
                     IsDeleted = e.IsDeleted,
                     Territories = e.Territories.Select(et => new TerritoryReadDto

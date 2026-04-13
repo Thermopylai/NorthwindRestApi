@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NorthwindRestApi.Common;
 using NorthwindRestApi.Data;
 using NorthwindRestApi.DTOs.Categories;
@@ -20,9 +21,9 @@ namespace NorthwindRestApi.Services
             _db = db;
         }
 
-        public async Task<List<CategoryListDto>> GetAllAsync(CancellationToken ct)
+        public async Task<List<CategoryReadDto>> GetAllAsync(CancellationToken ct)
         {
-            return await BuildCategoryListQuery()
+            return await BuildCategoryReadQuery()
                 .OrderBy(o => o.CategoryID)
                 .ToListAsync(ct);
         }
@@ -56,23 +57,31 @@ namespace NorthwindRestApi.Services
         }
 
         public async Task<CategoryReadDto> CreateAsync(
+            [FromForm]
             CategoryCreateDto dto, 
             CancellationToken ct)
         {
+            byte[]? imageBytes = null;
+
+            if (dto.Picture != null && dto.Picture.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await dto.Picture.CopyToAsync(ms, ct);
+                imageBytes = ms.ToArray();
+                imageBytes = ImageConverter.AddNorthwindPictureHeader(imageBytes);
+            }
+            
             var entity = new Category
             {
                 CategoryName = dto.CategoryName,
                 Description = dto.Description,
+                Picture = imageBytes,
                 IsDeleted = dto.IsDeleted
             };
 
             _db.Categories.Add(entity);
             await _db.SaveChangesAsync(ct);
-
-            await _db.Entry(entity)
-                .Reference(c => c.Products)
-                .LoadAsync(ct);
-
+            
             return await CategoryReadProjections.Build(
                     _db.Categories.AsNoTracking()
                         .Where(c => c.CategoryID == entity.CategoryID),
@@ -82,7 +91,8 @@ namespace NorthwindRestApi.Services
         }
 
         public async Task<CategoryReadDto?> UpdateAsync(
-            int id, 
+            int id,
+            [FromForm]
             CategoryUpdateDto dto, 
             CancellationToken ct)
         {
@@ -91,8 +101,19 @@ namespace NorthwindRestApi.Services
             if (entity == null)
                 return null;
 
+            byte[]? imageBytes = null;
+
+            if (dto.Picture != null && dto.Picture.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await dto.Picture.CopyToAsync(ms, ct);
+                imageBytes = ms.ToArray();
+                imageBytes = ImageConverter.AddNorthwindPictureHeader(imageBytes);
+            }
+
             entity.CategoryName = dto.CategoryName;
             entity.Description = dto.Description;
+            entity.Picture = imageBytes ?? entity.Picture;
             entity.IsDeleted = dto.IsDeleted;
 
             await _db.SaveChangesAsync(ct);

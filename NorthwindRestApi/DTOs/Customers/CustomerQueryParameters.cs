@@ -5,7 +5,6 @@
         // Filter parameters
         public string? Country { get; set; }
         public string? City { get; set; }
-        public string? CompanyName { get; set; }
         public bool? IsDeleted { get; set; }
 
         // Search parameter

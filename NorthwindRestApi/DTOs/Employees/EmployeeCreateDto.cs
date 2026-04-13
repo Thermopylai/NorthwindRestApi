@@ -53,6 +53,8 @@ namespace NorthwindRestApi.DTOs.Employees
 
         public int? ReportsTo { get; set; }
 
+        public IFormFile? Photo { get; set; }
+
         [StringLength(255)]
         public string? PhotoPath { get; set; }
 

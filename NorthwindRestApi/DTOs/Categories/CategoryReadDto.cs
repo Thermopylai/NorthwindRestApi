@@ -13,5 +13,6 @@ namespace NorthwindRestApi.DTOs.Categories
         public bool IsDeleted { get; set; }
         public List<ProductListDto> Products { get; set; } = new();
         public int? ProductCount { get; set; }
+        public string? Picture { get; set; }
     }
 }

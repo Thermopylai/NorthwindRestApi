@@ -5,7 +5,7 @@ namespace NorthwindRestApi.Services.Interfaces
 {
     public interface ICategoryService
     {
-        Task<List<CategoryListDto>> GetAllAsync(CancellationToken ct);
+        Task<List<CategoryReadDto>> GetAllAsync(CancellationToken ct);
         Task<CategoryReadDto?> GetByIdAsync(int id, CancellationToken ct);
         Task<PagedResult<CategoryReadDto>> GetPagedAsync(int page, int pageSize, CancellationToken ct);
         Task<PagedResult<CategoryReadDto>> SearchAsync(CategoryQueryParameters parameters, CancellationToken ct);

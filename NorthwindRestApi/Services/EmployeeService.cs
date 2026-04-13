@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NorthwindRestApi.Common;
 using NorthwindRestApi.Data;
 using NorthwindRestApi.DTOs.Employees;
@@ -56,8 +57,18 @@ namespace NorthwindRestApi.Services
             return await query.ToPagedResultAsync(parameters.Page, parameters.PageSize, ct);
         }
 
-        public async Task<EmployeeReadDto> CreateAsync(EmployeeCreateDto dto, CancellationToken ct)
+        public async Task<EmployeeReadDto> CreateAsync([FromForm] EmployeeCreateDto dto, CancellationToken ct)
         {
+            byte[]? imageBytes = null;
+
+            if (dto.Photo != null && dto.Photo.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await dto.Photo.CopyToAsync(ms, ct);
+                imageBytes = ms.ToArray();
+                imageBytes = ImageConverter.AddNorthwindPictureHeader(imageBytes);
+            }
+
             var entity = new Employee
             {
                 LastName = dto.LastName,
@@ -75,6 +86,7 @@ namespace NorthwindRestApi.Services
                 Extension = dto.Extension,
                 Notes = dto.Notes,
                 ReportsTo = dto.ReportsTo,
+                Photo = imageBytes,
                 PhotoPath = dto.PhotoPath,
                 IsDeleted = dto.IsDeleted,
                 Territories = dto.Territories.Select(et => new Territory
@@ -97,12 +109,22 @@ namespace NorthwindRestApi.Services
                         .FirstAsync(ct);
         }
 
-        public async Task<EmployeeReadDto?> UpdateAsync(int id, EmployeeUpdateDto dto, CancellationToken ct)
+        public async Task<EmployeeReadDto?> UpdateAsync(int id, [FromForm] EmployeeUpdateDto dto, CancellationToken ct)
         {
             var entity = await _db.Employees.FindAsync(new object[] { id }, ct);
 
             if (entity == null)
                 return null;
+
+            byte[]? imageBytes = null;
+
+            if (dto.Photo != null && dto.Photo.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await dto.Photo.CopyToAsync(ms, ct);
+                imageBytes = ms.ToArray();
+                imageBytes = ImageConverter.AddNorthwindPictureHeader(imageBytes);
+            }
 
             entity.LastName = dto.LastName;
             entity.FirstName = dto.FirstName;
@@ -119,6 +141,7 @@ namespace NorthwindRestApi.Services
             entity.Extension = dto.Extension;
             entity.Notes = dto.Notes;
             entity.ReportsTo = dto.ReportsTo;
+            entity.Photo = imageBytes ?? entity.Photo;
             entity.PhotoPath = dto.PhotoPath;
             entity.IsDeleted = dto.IsDeleted;
             entity.Territories = dto.Territories.Select(et => new Territory

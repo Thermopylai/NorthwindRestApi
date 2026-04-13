@@ -27,7 +27,8 @@ namespace NorthwindRestApi.Projections
                         .OrderBy(p => p.ProductName)
                         .ToList(),
                     ProductCount = products
-                        .Count(p => p.CategoryID == c.CategoryID)
+                        .Count(p => p.CategoryID == c.CategoryID),
+                    Picture = c.Picture != null ? ImageConverter.ConvertToBase64(c.Picture) : null
                 });
         }
     }

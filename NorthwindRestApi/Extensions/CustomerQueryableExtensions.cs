@@ -23,12 +23,6 @@ namespace NorthwindRestApi.Extensions
                                 p.City.Contains(parameters.City));
             }
 
-            if (!string.IsNullOrWhiteSpace(parameters.CompanyName))
-            {
-                query = query.Where(p => p.CompanyName != null &&
-                                p.CompanyName.Contains(parameters.CompanyName));
-            }
-
             if (parameters.IsDeleted.HasValue)
             {
                 query = query.Where(p => p.IsDeleted == parameters.IsDeleted.Value);

@@ -11,5 +11,6 @@ namespace NorthwindRestApi.DTOs.Categories
         [Column(TypeName = "ntext")]
         public string? Description { get; set; }
         public bool IsDeleted { get; set; }
+        public IFormFile? Picture { get; set; }
     }
 }

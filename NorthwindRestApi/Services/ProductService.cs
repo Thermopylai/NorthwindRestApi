@@ -81,10 +81,6 @@ namespace NorthwindRestApi.Services
             _db.Products.Add(entity);
             await _db.SaveChangesAsync(ct);
 
-            await _db.Entry(entity)
-                .Reference(p => p.Category)
-                .LoadAsync(ct);
-
             return await ProductReadProjections.Build(
                 _db.Products.AsNoTracking()
                     .Where(p => p.ProductID == entity.ProductID),
