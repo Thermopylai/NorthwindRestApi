@@ -19,7 +19,7 @@ namespace NorthwindRestApi.Controllers
             _service = service;
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
+        [Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
         [HttpGet]
         [ProducesResponseType(typeof(List<ShipperListDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<ShipperListDto>>> GetAll(CancellationToken ct)
@@ -28,7 +28,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(shippers);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
+        [Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ShipperReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,7 +42,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(shipper);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
+        [Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<ShipperReadDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<ShipperReadDto>>> GetPaged(
@@ -54,7 +54,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
+        [Authorize(Policy = AuthorizationPolicies.CanReadShippers)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<ShipperReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -70,7 +70,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanManageShippers)]
+        [Authorize(Policy = AuthorizationPolicies.CanManageShippers)]
         [HttpPost]
         [ProducesResponseType(typeof(ShipperReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<ShipperReadDto>> Create(ShipperCreateDto dto, CancellationToken ct)
@@ -80,7 +80,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.ShipperID }, created);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanManageShippers)]
+        [Authorize(Policy = AuthorizationPolicies.CanManageShippers)]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ShipperReadDto), StatusCodes.Status200OK)]
@@ -94,7 +94,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanManageShippers)]
+        [Authorize(Policy = AuthorizationPolicies.CanManageShippers)]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -108,7 +108,7 @@ namespace NorthwindRestApi.Controllers
             return NoContent();
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanManageShippers)]
+        [Authorize(Policy = AuthorizationPolicies.CanManageShippers)]
         [HttpPut("{id:int}/restore")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

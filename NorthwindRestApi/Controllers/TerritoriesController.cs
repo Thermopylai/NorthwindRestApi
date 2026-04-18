@@ -19,7 +19,7 @@ namespace NorthwindRestApi.Controllers
             _service = service;
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanReadTerritories)]
+        [Authorize(Policy = AuthorizationPolicies.CanReadTerritories)]
         [HttpGet]
         [ProducesResponseType(typeof(List<TerritoryReadDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<TerritoryReadDto>>> GetAll(CancellationToken ct)
@@ -28,7 +28,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(territories);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanReadTerritories)]
+        [Authorize(Policy = AuthorizationPolicies.CanReadTerritories)]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(TerritoryReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,7 +42,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(territory);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanReadTerritories)]
+        [Authorize(Policy = AuthorizationPolicies.CanReadTerritories)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<TerritoryReadDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<TerritoryReadDto>>> GetPaged(
@@ -54,7 +54,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanReadTerritories)]
+        [Authorize(Policy = AuthorizationPolicies.CanReadTerritories)]
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<TerritoryReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -70,7 +70,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
+        [Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
         [HttpPost]
         [ProducesResponseType(typeof(TerritoryReadDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<TerritoryReadDto>> Create(TerritoryCreateDto dto, CancellationToken ct)
@@ -80,7 +80,7 @@ namespace NorthwindRestApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.TerritoryID }, created);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
+        [Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(TerritoryReadDto), StatusCodes.Status200OK)]
@@ -94,7 +94,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(updated);
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
+        [Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -108,7 +108,7 @@ namespace NorthwindRestApi.Controllers
             return NoContent();
         }
 
-        //[Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
+        [Authorize(Policy = AuthorizationPolicies.CanManageTerritories)]
         [HttpPut("{id}/restore")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

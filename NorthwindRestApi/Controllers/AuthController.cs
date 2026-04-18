@@ -65,6 +65,18 @@ namespace NorthwindRestApi.Controllers
         }
 
         [Authorize]
+        [HttpPost("logout")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        public ActionResult<AuthResponseDto> Logout()
+        {
+            return Ok(new AuthResponseDto
+            {
+                Success = true,
+                Message = "Logout successful. Remove the token on the client."
+            });
+        }
+
+        [Authorize]
         [HttpGet("me")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult Me()
