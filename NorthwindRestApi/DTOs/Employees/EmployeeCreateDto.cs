@@ -60,6 +60,6 @@ namespace NorthwindRestApi.DTOs.Employees
 
         public bool IsDeleted { get; set; } = false;
 
-        public List<string> Territories { get; set; } = new();
+        public IEnumerable<string> Territories { get; set; } = new List<string>();
     }
 }
