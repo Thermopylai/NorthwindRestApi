@@ -25,11 +25,11 @@ namespace NorthwindRestApi
 
             builder.Services.AddIdentityCore<ApplicationUser>(options =>
                 {
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequiredLength = 16;
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
                 })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<AuthDbContext>()

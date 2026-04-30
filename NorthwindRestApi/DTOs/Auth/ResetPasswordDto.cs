@@ -7,7 +7,7 @@ namespace NorthwindRestApi.DTOs.Auth
         [Required]
         public string UserName { get; set; } = "";
         [Required]
-        [StringLength(100, MinimumLength = 6)]
+        [StringLength(100, MinimumLength = 16)]
         public string NewPassword { get; set; } = "";
     }
 }
