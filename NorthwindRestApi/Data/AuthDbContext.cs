@@ -10,5 +10,7 @@ namespace NorthwindRestApi.Data
             : base(options)
         {
         }
+
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     }
 }

@@ -4,11 +4,17 @@
     {
         public bool Success { get; set; }
         public string Message { get; set; } = "";
-        public string? Token { get; set; }
-        public DateTime? ExpiresAt { get; set; }
+
+        public string? AccessToken { get; set; }
+        public DateTime? AccessTokenExpiresAt { get; set; }
+
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiresAt { get; set; }
+
         public string UserId { get; set; } = "";
         public string UserName { get; set; } = "";
         public string Email { get; set; } = "";
+
         public IEnumerable<string> Roles { get; set; } = new List<string>();
         public IEnumerable<string> Permissions { get; set; } = new List<string>();
         public IEnumerable<UserReadDto> Users { get; set; } = new List<UserReadDto>();

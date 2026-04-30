@@ -48,20 +48,39 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpPost("logout")]
+        [HttpPost("refresh")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public ActionResult<AuthResponseDto> Logout()
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<AuthResponseDto>> Refresh(
+            RefreshTokenRequestDto dto,
+            CancellationToken ct)
         {
-            return Ok(new AuthResponseDto
-            {
-                Success = true,
-                Message = "Logout successful. Remove the token on the client."
-            });
+            var result = await _service.RefreshAsync(dto, ct);
+
+            if (!result.Success)
+                return Unauthorized(result);
+
+            return Ok(result);
         }
 
-        [HttpPut("assign-role")]
+        [HttpPost("logout")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthResponseDto>> Logout(
+            LogoutDto dto,
+            CancellationToken ct)
+        {
+            var result = await _service.LogoutAsync(dto, ct);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpPut("users/assign-role")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -79,7 +98,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [HttpPut("remove-role")]
+        [HttpPut("users/remove-role")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -97,17 +116,17 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("{userId}/change-password")]
+        [HttpPost("me/change-password")]
         [Authorize]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AuthResponseDto>> ChangePassword(
-            string userId,
             ChangePasswordDto dto,
             CancellationToken ct)
         {
-            var result = await _service.ChangePasswordAsync(userId, dto, ct);
+            var user = User;
+            var result = await _service.ChangePasswordAsync(user, dto, ct);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -115,7 +134,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("reset-password")]
+        [HttpPost("users/reset-password")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -133,17 +152,17 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{userId}/update-user-info")]
+        [HttpPut("me")]
         [Authorize]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthResponseDto>> UpdateUserInfo(
-            string userId,
+        public async Task<ActionResult<AuthResponseDto>> UpdateUser(
             UpdateUserDto dto,
             CancellationToken ct)
         {
-            var result = await _service.UpdateUserAsync(userId, dto, ct);
+            var user = User;
+            var result = await _service.UpdateUserAsync(user, dto, ct);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -152,7 +171,7 @@ namespace NorthwindRestApi.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{userId}/delete-user")]
+        [HttpDelete("users/{userId}")]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -170,7 +189,7 @@ namespace NorthwindRestApi.Controllers
         }
         
         [Authorize(Roles = "Admin")]
-        [HttpGet("get-all-users")]
+        [HttpGet("users")]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -183,7 +202,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(users);
         }
 
-        [HttpGet("get-user-info")]
+        [HttpGet("me")]
         [Authorize]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -197,7 +216,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(userInfo);
         }
 
-        [HttpGet("search-users")]
+        [HttpGet("users/search")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -213,7 +232,7 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet("list-role-permissions")]
+        [HttpGet("users/list-role-permissions")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

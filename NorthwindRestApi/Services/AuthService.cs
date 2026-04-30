@@ -10,6 +10,7 @@ using NorthwindRestApi.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace NorthwindRestApi.Services
 {
@@ -93,14 +94,28 @@ namespace NorthwindRestApi.Services
                 };
             }
 
-            var (token, expiresAt) = await GenerateJwtTokenAsync(user);
+            var (accessToken, accessTokenExpiresAt) = await GenerateJwtTokenAsync(user);
+
+            var rawRefreshToken = GenerateRefreshToken();
+            var refreshToken = CreateRefreshToken(user.Id, rawRefreshToken);
+
+            _authDbContext.RefreshTokens.Add(refreshToken);
+            await _authDbContext.SaveChangesAsync(ct);
 
             return new AuthResponseDto
             {
                 Success = true,
                 Message = "User registered successfully.",
-                Token = token,
-                ExpiresAt = expiresAt
+
+                AccessToken = accessToken,
+                AccessTokenExpiresAt = accessTokenExpiresAt,
+
+                RefreshToken = rawRefreshToken,
+                RefreshTokenExpiresAt = refreshToken.ExpiresAt,
+
+                UserId = user.Id,
+                UserName = user.UserName ?? "",
+                Email = user.Email ?? ""
             };
         }
 
@@ -128,14 +143,120 @@ namespace NorthwindRestApi.Services
                 };
             }
 
-            var (token, expiresAt) = await GenerateJwtTokenAsync(user);
+            var (accessToken, accessTokenExpiresAt) = await GenerateJwtTokenAsync(user);
+
+            var rawRefreshToken = GenerateRefreshToken();
+            var refreshToken = CreateRefreshToken(user.Id, rawRefreshToken);
+
+            _authDbContext.RefreshTokens.Add(refreshToken);
+            await _authDbContext.SaveChangesAsync(ct);
 
             return new AuthResponseDto
             {
                 Success = true,
                 Message = "Login successful.",
-                Token = token,
-                ExpiresAt = expiresAt
+
+                AccessToken = accessToken,
+                AccessTokenExpiresAt = accessTokenExpiresAt,
+
+                RefreshToken = rawRefreshToken,
+                RefreshTokenExpiresAt = refreshToken.ExpiresAt,
+
+                UserId = user.Id,
+                UserName = user.UserName ?? "",
+                Email = user.Email ?? ""
+            };
+        }
+
+        public async Task<AuthResponseDto> RefreshAsync(RefreshTokenRequestDto dto, CancellationToken ct)
+        {
+            var tokenHash = HashToken(dto.RefreshToken);
+
+            var storedToken = await _authDbContext.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash, ct);
+
+            if (storedToken == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid refresh token."
+                };
+            }
+
+            if (!storedToken.IsActive)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Refresh token is expired or revoked."
+                };
+            }
+
+            var user = storedToken.User;
+
+            var (newAccessToken, newAccessTokenExpiresAt) = await GenerateJwtTokenAsync(user);
+
+            var newRawRefreshToken = GenerateRefreshToken();
+            var newRefreshToken = CreateRefreshToken(user.Id, newRawRefreshToken);
+
+            storedToken.RevokedAt = DateTime.UtcNow;
+            storedToken.ReplacedByTokenHash = newRefreshToken.TokenHash;
+
+            _authDbContext.RefreshTokens.Add(newRefreshToken);
+            await _authDbContext.SaveChangesAsync(ct);
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "Token refreshed successfully.",
+
+                AccessToken = newAccessToken,
+                AccessTokenExpiresAt = newAccessTokenExpiresAt,
+
+                RefreshToken = newRawRefreshToken,
+                RefreshTokenExpiresAt = newRefreshToken.ExpiresAt,
+
+                UserId = user.Id,
+                UserName = user.UserName ?? "",
+                Email = user.Email ?? ""
+            };
+        }
+
+        public async Task<AuthResponseDto> LogoutAsync(LogoutDto dto, CancellationToken ct)
+        {
+            var tokenHash = HashToken(dto.RefreshToken);
+
+            var storedToken = await _authDbContext.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash, ct);
+
+            if (storedToken == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid refresh token."
+                };
+            }
+
+            if (storedToken.RevokedAt != null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Refresh token was already revoked."
+                };
+            }
+
+            storedToken.RevokedAt = DateTime.UtcNow;
+
+            await _authDbContext.SaveChangesAsync(ct);
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "Logout successful. Refresh token revoked."
             };
         }
 
@@ -147,6 +268,7 @@ namespace NorthwindRestApi.Services
 
             var claims = new List<Claim>
             {
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName ?? ""),
                 new Claim(ClaimTypes.Email, user.Email ?? "")
@@ -180,6 +302,30 @@ namespace NorthwindRestApi.Services
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return (tokenString, expiresAt);
+        }
+
+        private static string GenerateRefreshToken()
+        {
+            var randomBytes = RandomNumberGenerator.GetBytes(64);
+            return Convert.ToBase64String(randomBytes);
+        }
+
+        private static string HashToken(string token)
+        {
+            var bytes = Encoding.UTF8.GetBytes(token);
+            var hash = SHA256.HashData(bytes);
+            return Convert.ToBase64String(hash);
+        }
+
+        private RefreshToken CreateRefreshToken(string userId, string rawRefreshToken)
+        {
+            return new RefreshToken
+            {
+                UserId = userId,
+                TokenHash = HashToken(rawRefreshToken),
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
+            };
         }
 
         public async Task<AuthResponseDto> AssignRoleAsync(AssignRoleDto dto, CancellationToken ct)
@@ -279,11 +425,12 @@ namespace NorthwindRestApi.Services
             };
         }
 
-        public async Task<AuthResponseDto> ChangePasswordAsync(string userId, ChangePasswordDto dto, CancellationToken ct)
+        public async Task<AuthResponseDto> ChangePasswordAsync(ClaimsPrincipal user, ChangePasswordDto dto, CancellationToken ct)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            var appUser = await _userManager.FindByIdAsync(userId);
 
-            if (user == null)
+            if (appUser == null)
             {
                 return new AuthResponseDto
                 {
@@ -292,7 +439,7 @@ namespace NorthwindRestApi.Services
                 };
             }
 
-            var passwordValid = await _userManager.CheckPasswordAsync(user, dto.CurrentPassword);
+            var passwordValid = await _userManager.CheckPasswordAsync(appUser, dto.CurrentPassword);
 
             if (!passwordValid)
             {
@@ -303,7 +450,7 @@ namespace NorthwindRestApi.Services
                 };
             }
 
-            var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+            var result = await _userManager.ChangePasswordAsync(appUser, dto.CurrentPassword, dto.NewPassword);
 
             if (!result.Succeeded)
             {
@@ -353,10 +500,11 @@ namespace NorthwindRestApi.Services
             };
         }
 
-        public async Task<AuthResponseDto> UpdateUserAsync(string userId, UpdateUserDto dto, CancellationToken ct)
+        public async Task<AuthResponseDto> UpdateUserAsync(ClaimsPrincipal user, UpdateUserDto dto, CancellationToken ct)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            var appUser = await _userManager.FindByIdAsync(userId);
+            if (appUser == null)
             {
                 return new AuthResponseDto
                 {
@@ -365,7 +513,7 @@ namespace NorthwindRestApi.Services
                 };
             }
 
-            var passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+            var passwordValid = await _userManager.CheckPasswordAsync(appUser, dto.Password);
 
             if (!passwordValid)
             {
@@ -376,10 +524,13 @@ namespace NorthwindRestApi.Services
                 };
             }
 
-            user.UserName = dto.UserName ?? user.UserName;
-            user.Email = dto.Email ?? user.Email;
+            if (!string.IsNullOrWhiteSpace(dto.UserName))
+                appUser.UserName = dto.UserName;
 
-            var result = await _userManager.UpdateAsync(user);
+            if (!string.IsNullOrWhiteSpace(dto.Email))
+                appUser.Email = dto.Email;
+
+            var result = await _userManager.UpdateAsync(appUser);
 
             if (!result.Succeeded)
             {
