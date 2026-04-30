@@ -32,22 +32,6 @@ namespace NorthwindRestApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("assign-role")]
-        [Authorize(Roles = "Admin")]
-        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthResponseDto>> AssignRole(
-            AssignRoleDto dto,
-            CancellationToken ct)
-        {
-            var result = await _service.AssignRoleAsync(dto, ct);
-
-            if (!result.Success)
-                return BadRequest(result);
-
-            return Ok(result);
-        }
-
         [HttpPost("login")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
@@ -67,6 +51,7 @@ namespace NorthwindRestApi.Controllers
         [Authorize]
         [HttpPost("logout")]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult<AuthResponseDto> Logout()
         {
             return Ok(new AuthResponseDto
@@ -76,30 +61,170 @@ namespace NorthwindRestApi.Controllers
             });
         }
 
-        [Authorize]
-        [HttpGet("me")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Me()
+        [HttpPut("assign-role")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthResponseDto>> AssignRole(
+            AssignRoleDto dto,
+            CancellationToken ct)
         {
-            return Ok(new
-            {
-                UserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
-                UserName = User.Identity?.Name,
-                Email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
-            });
+            var result = await _service.AssignRoleAsync(dto, ct);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
-        [Authorize]
-        [HttpGet("claims")]
-        public IActionResult GetClaims()
+        [HttpPut("remove-role")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthResponseDto>> RemoveRole(
+            AssignRoleDto dto,
+            CancellationToken ct)
         {
-            var claims = User.Claims.Select(c => new
-            {
-                c.Type,
-                c.Value
-            });
+            var result = await _service.RemoveRoleAsync(dto, ct);
 
-            return Ok(claims);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpPost("{userId}/change-password")]
+        [Authorize]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthResponseDto>> ChangePassword(
+            string userId,
+            ChangePasswordDto dto,
+            CancellationToken ct)
+        {
+            var result = await _service.ChangePasswordAsync(userId, dto, ct);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpPost("reset-password")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthResponseDto>> ResetPassword(
+            ResetPasswordDto dto,
+            CancellationToken ct)
+        {
+            var result = await _service.ResetPasswordAsync(dto, ct);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpPut("{userId}/update-user-info")]
+        [Authorize]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthResponseDto>> UpdateUserInfo(
+            string userId,
+            UpdateUserDto dto,
+            CancellationToken ct)
+        {
+            var result = await _service.UpdateUserAsync(userId, dto, ct);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{userId}/delete-user")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthResponseDto>> DeleteUser(
+            string userId,
+            CancellationToken ct)
+        {
+            var result = await _service.DeleteUserAsync(userId, ct);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpGet("get-all-users")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AuthResponseDto>> GetAllUsers(CancellationToken ct)
+        {
+            var users = await _service.GetAllUsersAsync(ct);
+            if (users == null)
+                return NotFound();
+            return Ok(users);
+        }
+
+        [HttpGet("get-user-info")]
+        [Authorize]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AuthResponseDto>> GetUserInfo(CancellationToken ct)
+        {
+            var user = User;
+            var userInfo = await _service.GetUserInfoAsync(user, ct);
+            if (userInfo == null)
+                return NotFound();
+            return Ok(userInfo);
+        }
+
+        [HttpGet("search-users")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AuthResponseDto>> SearchUsers(
+            [FromQuery] UserQueryParameters parameters,
+            CancellationToken ct)
+        {
+            var result = await _service.SearchAsync(parameters, ct);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
+
+        [HttpGet("list-role-permissions")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AuthResponseDto>> ListRolePermissions(CancellationToken ct)
+        {
+            var result = await _service.ListRolePermissionsAsync(ct);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
     }
 }

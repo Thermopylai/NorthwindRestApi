@@ -11,6 +11,18 @@ namespace NorthwindRestApi.Extensions
         {
             query = query.IgnoreQueryFilters();
 
+            if (!string.IsNullOrWhiteSpace(parameters.Country))
+            {
+                query = query.Where(p => p.Country != null &&
+                                p.Country.Contains(parameters.Country));
+            }
+
+            if (!string.IsNullOrWhiteSpace(parameters.City))
+            {
+                query = query.Where(p => p.City != null &&
+                                p.City.Contains(parameters.City));
+            }
+
             if (parameters.IsDeleted.HasValue)
             {
                 query = query.Where(p => p.IsDeleted == parameters.IsDeleted.Value);

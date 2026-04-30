@@ -21,6 +21,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanReadOrders)]
         [HttpGet]
         [ProducesResponseType(typeof(List<OrderListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<List<OrderListDto>>> GetAll(CancellationToken ct)
         {
             var orders = await _service.GetAllAsync(ct);
@@ -31,6 +33,8 @@ namespace NorthwindRestApi.Controllers
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(OrderReadDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<OrderReadDto>> GetById(int id, CancellationToken ct)
         {
             var order = await _service.GetByIdAsync(id, ct);
@@ -45,6 +49,8 @@ namespace NorthwindRestApi.Controllers
         [HttpGet("by-customer/{customerId}")]
         [ProducesResponseType(typeof(List<OrderReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<List<OrderReadDto>>> GetByCustomerId(string customerId, CancellationToken ct)
         {
             var orders = await _service.GetByCustomerIdAsync(customerId, ct);
@@ -60,6 +66,8 @@ namespace NorthwindRestApi.Controllers
         [ProducesResponseType(typeof(List<OrderReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<List<OrderReadDto>>> GetByDateRange(
             [FromQuery] DateTime start,
             [FromQuery] DateTime end,
@@ -79,6 +87,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanReadOrders)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<OrderReadDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<PagedResult<OrderReadDto>>> GetPaged(
             CancellationToken ct,
             [FromQuery] int page = 1,
@@ -92,6 +102,8 @@ namespace NorthwindRestApi.Controllers
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<OrderReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PagedResult<OrderReadDto>>> Search([FromQuery] OrderQueryParameters parameters, CancellationToken ct)
         {
@@ -103,7 +115,7 @@ namespace NorthwindRestApi.Controllers
 
             var result = await _service.SearchAsync(parameters, ct);
 
-            if (!result.Items.Any())
+            if (result.Items.Count == 0)
                 return NotFound();
 
             return Ok(result);
@@ -112,6 +124,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanManageOrders)]
         [HttpPost]
         [ProducesResponseType(typeof(OrderReadDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<OrderReadDto>> Create(OrderCreateDto dto, CancellationToken ct)
         {
             var created = await _service.CreateAsync(dto, ct);
@@ -123,6 +137,8 @@ namespace NorthwindRestApi.Controllers
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(OrderReadDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<OrderReadDto>> Update(int id, OrderUpdateDto dto, CancellationToken ct)
         {
             var updated = await _service.UpdateAsync(id, dto, ct);
@@ -137,6 +153,8 @@ namespace NorthwindRestApi.Controllers
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var success = await _service.DeleteAsync(id, ct);
@@ -151,6 +169,8 @@ namespace NorthwindRestApi.Controllers
         [HttpPut("{id:int}/restore")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Restore(int id, CancellationToken ct)
         {
             var success = await _service.RestoreAsync(id, ct);

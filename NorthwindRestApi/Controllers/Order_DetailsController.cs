@@ -23,6 +23,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet]
         [ProducesResponseType(typeof(List<Order_DetailReadDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<List<Order_DetailReadDto>>> GetAll(CancellationToken ct)
         {
             var order_details = await _service.GetAllAsync(ct);
@@ -32,6 +34,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("{orderId:int}/{productId:int}")]
         [ProducesResponseType(typeof(Order_DetailReadDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Order_DetailReadDto>> GetById(int orderId, int productId, CancellationToken ct)
         {
@@ -46,6 +50,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("by-order/{orderId:int}")]
         [ProducesResponseType(typeof(List<Order_DetailReadDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<Order_DetailReadDto>>> GetByOrderId(int orderId, CancellationToken ct)
         {
@@ -60,6 +66,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("by-product/{productId:int}")]
         [ProducesResponseType(typeof(List<Order_DetailReadDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<Order_DetailReadDto>>> GetByProductId(int productId, CancellationToken ct)
         {
@@ -74,6 +82,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanReadOrderDetails)]
         [HttpGet("paged")]
         [ProducesResponseType(typeof(PagedResult<Order_DetailReadDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<PagedResult<Order_DetailReadDto>>> GetPaged(
             CancellationToken ct,
             [FromQuery] int page = 1,
@@ -88,6 +98,8 @@ namespace NorthwindRestApi.Controllers
         [ProducesResponseType(typeof(PagedResult<Order_DetailReadDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<PagedResult<Order_DetailReadDto>>> Search([FromQuery] Order_DetailQueryParameters parameters, CancellationToken ct)
         {
             if (parameters.MinTotalPrice.HasValue && parameters.MaxTotalPrice.HasValue &&
@@ -98,7 +110,7 @@ namespace NorthwindRestApi.Controllers
 
             var result = await _service.SearchAsync(parameters, ct);
 
-            if (!result.Items.Any())
+            if (result.Items.Count == 0)
                 return NotFound();
 
             return Ok(result);
@@ -107,6 +119,8 @@ namespace NorthwindRestApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.CanManageOrderDetails)]
         [HttpPost]
         [ProducesResponseType(typeof(Order_DetailReadDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<Order_DetailReadDto>> Create(Order_DetailCreateDto dto, CancellationToken ct)
         {
             var created = await _service.CreateAsync(dto, ct);
@@ -118,6 +132,8 @@ namespace NorthwindRestApi.Controllers
         [HttpPut("{orderId:int}/{productId:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Order_DetailReadDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<Order_DetailReadDto?>> Update(int orderId, int productId, Order_DetailUpdateDto dto, CancellationToken ct)
         {
             var updated = await _service.UpdateAsync(orderId, productId, dto, ct);
@@ -132,6 +148,8 @@ namespace NorthwindRestApi.Controllers
         [HttpDelete("{orderId:int}/{productId:int}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete(int orderId, int productId, CancellationToken ct)
         {
             var success = await _service.DeleteAsync(orderId, productId, ct);
@@ -146,6 +164,8 @@ namespace NorthwindRestApi.Controllers
         [HttpPut("{orderId:int}/{productId:int}/restore")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Restore(int orderId, int productId, CancellationToken ct)
         {
             var success = await _service.RestoreAsync(orderId, productId, ct);

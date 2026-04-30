@@ -1,13 +1,15 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NorthwindRestApi.Common;
+using NorthwindRestApi.Data;
 using NorthwindRestApi.DTOs.Auth;
 using NorthwindRestApi.Models.Identity;
 using NorthwindRestApi.Services.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace NorthwindRestApi.Services
 {
@@ -15,15 +17,18 @@ namespace NorthwindRestApi.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly AuthDbContext _authDbContext;
         private readonly JwtSettings _jwtSettings;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
+            AuthDbContext authDbContext,
             IOptions<JwtSettings> jwtOptions)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _authDbContext = authDbContext;
             _jwtSettings = jwtOptions.Value;
         }
 
@@ -99,54 +104,6 @@ namespace NorthwindRestApi.Services
             };
         }
 
-        public async Task<AuthResponseDto> AssignRoleAsync(AssignRoleDto dto, CancellationToken ct)
-        {
-            var user = await _userManager.FindByNameAsync(dto.UserName);
-            if (user == null)
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "User not found."
-                };
-            }
-
-            if (!await _roleManager.RoleExistsAsync(dto.RoleName))
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Role does not exist."
-                };
-            }
-
-            if (await _userManager.IsInRoleAsync(user, dto.RoleName))
-            {
-                return new AuthResponseDto
-                {
-                    Success = true,
-                    Message = "User already has this role."
-                };
-            }
-
-            var result = await _userManager.AddToRoleAsync(user, dto.RoleName);
-
-            if (!result.Succeeded)
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = string.Join(" | ", result.Errors.Select(e => e.Description))
-                };
-            }
-
-            return new AuthResponseDto
-            {
-                Success = true,
-                Message = $"Role '{dto.RoleName}' assigned to '{dto.UserName}'."
-            };
-        }
-
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto, CancellationToken ct)
         {
             var user = await _userManager.FindByNameAsync(dto.UserName);
@@ -156,7 +113,7 @@ namespace NorthwindRestApi.Services
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Invalid username or password."
+                    Message = "Invalid username."
                 };
             }
 
@@ -167,7 +124,7 @@ namespace NorthwindRestApi.Services
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Invalid username or password."
+                    Message = "Invalid password."
                 };
             }
 
@@ -223,6 +180,516 @@ namespace NorthwindRestApi.Services
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return (tokenString, expiresAt);
+        }
+
+        public async Task<AuthResponseDto> AssignRoleAsync(AssignRoleDto dto, CancellationToken ct)
+        {
+            var user = await _userManager.FindByNameAsync(dto.UserName);
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            if (!await _roleManager.RoleExistsAsync(dto.RoleName))
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Role does not exist."
+                };
+            }
+
+            if (await _userManager.IsInRoleAsync(user, dto.RoleName))
+            {
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "User already has this role."
+                };
+            }
+
+            var result = await _userManager.AddToRoleAsync(user, dto.RoleName);
+
+            if (!result.Succeeded)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = string.Join(" | ", result.Errors.Select(e => e.Description))
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = $"Role '{dto.RoleName}' assigned to '{dto.UserName}'."
+            };
+        }
+
+        public async Task<AuthResponseDto> RemoveRoleAsync(AssignRoleDto dto, CancellationToken ct)
+        {
+            var user = await _userManager.FindByNameAsync(dto.UserName);
+
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            if (!await _roleManager.RoleExistsAsync(dto.RoleName))
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Role does not exist."
+                };
+            }
+
+            if (!await _userManager.IsInRoleAsync(user, dto.RoleName))
+            {
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "User does not have this role."
+                };
+            }
+
+            var result = await _userManager.RemoveFromRoleAsync(user, dto.RoleName);
+
+            if (!result.Succeeded)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = string.Join(" | ", result.Errors.Select(e => e.Description))
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = $"Role '{dto.RoleName}' removed from '{dto.UserName}'."
+            };
+        }
+
+        public async Task<AuthResponseDto> ChangePasswordAsync(string userId, ChangePasswordDto dto, CancellationToken ct)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            var passwordValid = await _userManager.CheckPasswordAsync(user, dto.CurrentPassword);
+
+            if (!passwordValid)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Current password is incorrect."
+                };
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = string.Join(" | ", result.Errors.Select(e => e.Description))
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "Password changed successfully."
+            };
+        }
+
+        public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto, CancellationToken ct)
+        {
+            var user = await _userManager.FindByNameAsync(dto.UserName);
+
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, dto.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = string.Join(" | ", result.Errors.Select(e => e.Description))
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "Password reset successfully."
+            };
+        }
+
+        public async Task<AuthResponseDto> UpdateUserAsync(string userId, UpdateUserDto dto, CancellationToken ct)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            var passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+
+            if (!passwordValid)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid password."
+                };
+            }
+
+            user.UserName = dto.UserName ?? user.UserName;
+            user.Email = dto.Email ?? user.Email;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = string.Join(" | ", result.Errors.Select(e => e.Description))
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "User updated successfully."
+            };
+        }
+
+        public async Task<AuthResponseDto> DeleteUserAsync(string userId, CancellationToken ct)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = string.Join(" | ", result.Errors.Select(e => e.Description))
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "User deleted successfully."
+            };
+        }
+
+        public async Task<AuthResponseDto> GetAllUsersAsync(CancellationToken ct)
+        {
+            var users = await _userManager.Users.AsNoTracking().ToListAsync(ct);
+            var userIds = users.Select(u => u.Id).ToList();
+
+            // Load all user->role rows in one SQL query
+            var userRoleRows = await (
+                from ur in _authDbContext.UserRoles
+                join r in _authDbContext.Roles on ur.RoleId equals r.Id
+                where userIds.Contains(ur.UserId)
+                select new
+                {
+                    ur.UserId,
+                    RoleName = r.Name
+                }
+            ).ToListAsync(ct);
+
+            var rolesByUserId = userRoleRows
+                .Where(x => !string.IsNullOrWhiteSpace(x.RoleName))
+                .GroupBy(x => x.UserId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => (IList<string>)g.Select(x => x.RoleName!).Distinct().ToList()
+                );
+
+            var userDtos = users.Select(u =>
+            {
+                rolesByUserId.TryGetValue(u.Id, out var roles);
+                roles ??= new List<string>();
+
+                var permissions = roles
+                    .SelectMany(role => RolePermissions.Map.TryGetValue(role, out var perms)
+                        ? perms
+                        : Array.Empty<string>())
+                    .Distinct()
+                    .ToList();
+
+                var rolePermissions = roles
+                    .Distinct()
+                    .Select(role => new RolePermissionsDto
+                    {
+                        RoleName = role,
+                        Permissions = RolePermissions.Map.TryGetValue(role, out var perms)
+                            ? perms
+                            : Array.Empty<string>()
+                    })
+                    .ToList();
+
+                return new UserReadDto
+                {
+                    UserId = u.Id,
+                    UserName = u.UserName ?? "",
+                    Email = u.Email ?? "",
+                    Roles = roles,
+                    Permissions = permissions,
+                    RolePermissions = rolePermissions
+                };
+            }).ToList();
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "Users retrieved successfully.",
+                Users = userDtos
+            };
+        }
+
+        public async Task<AuthResponseDto> GetUserInfoAsync(ClaimsPrincipal user, CancellationToken ct)
+        {
+            var currentUser = await _userManager.GetUserAsync(user);
+
+            if (currentUser == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            // SQL: only fetch role names
+            var roles = await (
+                from ur in _authDbContext.UserRoles
+                join r in _authDbContext.Roles on ur.RoleId equals r.Id
+                where ur.UserId == currentUser.Id
+                select r.Name
+            )
+            .Where(name => name != null)
+            .Select(name => name!)
+            .Distinct()
+            .ToListAsync(ct);
+
+            // In-memory mapping: role -> permissions
+            var permissions = roles
+                .SelectMany(role => RolePermissions.Map.TryGetValue(role, out var perms)
+                    ? perms
+                    : Array.Empty<string>())
+                .Distinct()
+                .ToList();
+
+            var rolePermissionsDtos = roles
+                .Select(role => new RolePermissionsDto
+                {
+                    RoleName = role,
+                    Permissions = RolePermissions.Map.TryGetValue(role, out var perms)
+                        ? perms
+                        : Array.Empty<string>()
+                })
+                .ToList();
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "User info retrieved successfully.",
+                UserId = currentUser.Id,
+                UserName = currentUser.UserName ?? "",
+                Email = currentUser.Email ?? "",
+                Roles = roles,
+                Permissions = permissions,
+                RolePermissions = rolePermissionsDtos
+            };
+        }
+
+        public async Task<AuthResponseDto> SearchAsync(UserQueryParameters parameters, CancellationToken ct)
+        {
+            var query = _userManager.Users.AsNoTracking();
+
+            if (!string.IsNullOrEmpty(parameters.UserId))
+            {
+                query = query.Where(u => u.Id.Contains(parameters.UserId));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.UserName))
+            {
+                query = query.Where(u => u.UserName.Contains(parameters.UserName));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.Email))
+            {
+                query = query.Where(u => u.Email.Contains(parameters.Email));
+            }
+
+            // Role filter (SQL)
+            if (!string.IsNullOrEmpty(parameters.Role))
+            {
+                var normalizedRole = parameters.Role.ToUpperInvariant();
+
+                var userIdsInRole =
+                    from ur in _authDbContext.UserRoles
+                    join r in _authDbContext.Roles on ur.RoleId equals r.Id
+                    where r.NormalizedName != null && r.NormalizedName.Contains(normalizedRole)
+                    select ur.UserId;
+
+                query = query.Where(u => userIdsInRole.Contains(u.Id));
+            }
+
+            // Permission filter (SQL)
+            if (!string.IsNullOrEmpty(parameters.Permission))
+            {
+                var permissionTerm = parameters.Permission.Trim();
+
+                var rolesWithPermissionNormalized = RolePermissions.Map
+                    .Where(kvp => kvp.Value.Any(p => p.Contains(permissionTerm, StringComparison.OrdinalIgnoreCase)))
+                    .Select(kvp => kvp.Key.ToUpperInvariant())
+                    .ToList();
+
+                if (rolesWithPermissionNormalized.Count == 0)
+                {
+                    query = query.Where(_ => false);
+                }
+                else
+                {
+                    var userIdsWithPermission =
+                        from ur in _authDbContext.UserRoles
+                        join r in _authDbContext.Roles on ur.RoleId equals r.Id
+                        where r.NormalizedName != null && rolesWithPermissionNormalized.Contains(r.NormalizedName)
+                        select ur.UserId;
+
+                    query = query.Where(u => userIdsWithPermission.Contains(u.Id));
+                }
+            }
+
+            // Materialize matched users
+            var users = await query.ToListAsync(ct);
+            var userIds = users.Select(u => u.Id).ToList();
+
+            // Batch load roles for all matched users in ONE query
+            var userRoleRows = await (
+                from ur in _authDbContext.UserRoles
+                join r in _authDbContext.Roles on ur.RoleId equals r.Id
+                where userIds.Contains(ur.UserId)
+                select new
+                {
+                    ur.UserId,
+                    RoleName = r.Name
+                }
+            ).ToListAsync(ct);
+
+            var rolesByUserId = userRoleRows
+                .Where(x => !string.IsNullOrWhiteSpace(x.RoleName))
+                .GroupBy(x => x.UserId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => (IList<string>)g.Select(x => x.RoleName!).Distinct().ToList()
+                );
+
+            var userDtos = users.Select(u =>
+            {
+                rolesByUserId.TryGetValue(u.Id, out var roles);
+                roles ??= new List<string>();
+
+                var permissions = roles
+                    .SelectMany(role => RolePermissions.Map.TryGetValue(role, out var perms)
+                        ? perms
+                        : Array.Empty<string>())
+                    .Distinct()
+                    .ToList();
+
+                var rolePermissions = roles
+                    .Distinct()
+                    .Select(role => new RolePermissionsDto
+                    {
+                        RoleName = role,
+                        Permissions = RolePermissions.Map.TryGetValue(role, out var perms)
+                            ? perms
+                            : Array.Empty<string>()
+                    })
+                    .ToList();
+
+                return new UserReadDto
+                {
+                    UserId = u.Id,
+                    UserName = u.UserName ?? "",
+                    Email = u.Email ?? "",
+                    Roles = roles,
+                    Permissions = permissions,
+                    RolePermissions = rolePermissions
+                };
+            }).ToList();
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "Search completed successfully.",
+                Users = userDtos
+            };
+        }
+
+        public async Task<AuthResponseDto> ListRolePermissionsAsync(CancellationToken ct)
+        {
+            var rolePermissions = RolePermissions.Map.Select(kvp => new RolePermissionsDto
+            {
+                RoleName = kvp.Key,
+                Permissions = kvp.Value
+            }).ToList();
+
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "Role permissions retrieved successfully.",
+                RolePermissions = rolePermissions
+            };
         }
     }
 }

@@ -10,7 +10,7 @@ namespace NorthwindRestApi.Data
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-            string[] roles = ["Admin", "User"];
+            string[] roles = { "Admin", "User" };
 
             foreach (var role in roles)
             {
@@ -25,6 +25,8 @@ namespace NorthwindRestApi.Data
             const string adminPassword = "admin123";
 
             var admin = await userManager.FindByNameAsync(adminUserName);
+
+            var adminCreated = false;
 
             if (admin == null)
             {
@@ -42,15 +44,15 @@ namespace NorthwindRestApi.Data
                     var errors = string.Join(" | ", result.Errors.Select(e => e.Description));
                     throw new InvalidOperationException($"Admin user creation failed: {errors}");
                 }
+
+                adminCreated = true;
             }
 
-            if (!await userManager.IsInRoleAsync(admin, "Admin"))
+            // Only enforce the default roles at creation time.
+            // Otherwise, manual role removals will be re-added on every restart.
+            if (adminCreated)
             {
                 await userManager.AddToRoleAsync(admin, "Admin");
-            }
-
-            if (!await userManager.IsInRoleAsync(admin, "User"))
-            {
                 await userManager.AddToRoleAsync(admin, "User");
             }
         }

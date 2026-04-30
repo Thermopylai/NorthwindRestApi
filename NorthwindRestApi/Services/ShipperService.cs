@@ -20,9 +20,9 @@ namespace NorthwindRestApi.Services
             _db = db;
         }
 
-        public async Task<List<ShipperListDto>> GetAllAsync(CancellationToken ct)
+        public async Task<List<ShipperReadDto>> GetAllAsync(CancellationToken ct)
         {
-            return await BuildShipperListQuery()
+            return await BuildShipperReadQuery()
                 .OrderBy(s => s.ShipperID)
                 .ToListAsync(ct);
         }
