@@ -627,6 +627,17 @@ namespace NorthwindRestApi.Services
                     })
                     .ToList();
 
+                var claims = rolesByUserId.TryGetValue(u.Id, out var userRoles)
+                    ? userRoles.SelectMany(role => RolePermissions.Map.TryGetValue(role, out var perms)
+                        ? perms
+                        : Array.Empty<string>())
+                        .Select(p => new ClaimDto
+                        {
+                            Type = "permission",
+                            Value = p
+                        })
+                    : Enumerable.Empty<ClaimDto>();
+
                 return new UserReadDto
                 {
                     UserId = u.Id,
@@ -634,7 +645,8 @@ namespace NorthwindRestApi.Services
                     Email = u.Email ?? "",
                     Roles = roles,
                     Permissions = permissions,
-                    RolePermissions = rolePermissions
+                    RolePermissions = rolePermissions,
+                    Claims = claims
                 };
             }).ToList();
 
@@ -689,6 +701,14 @@ namespace NorthwindRestApi.Services
                 })
                 .ToList();
 
+            var claims = rolePermissionsDtos
+                .SelectMany(rp => rp.Permissions.Select(p => new ClaimDto
+                {
+                    Type = "permission",
+                    Value = p
+                }))
+                .ToList();
+
             return new AuthResponseDto
             {
                 Success = true,
@@ -698,7 +718,8 @@ namespace NorthwindRestApi.Services
                 Email = currentUser.Email ?? "",
                 Roles = roles,
                 Permissions = permissions,
-                RolePermissions = rolePermissionsDtos
+                RolePermissions = rolePermissionsDtos,
+                Claims = claims
             };
         }
 

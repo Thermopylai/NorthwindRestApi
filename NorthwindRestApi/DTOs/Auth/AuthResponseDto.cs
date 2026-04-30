@@ -1,4 +1,6 @@
-﻿namespace NorthwindRestApi.DTOs.Auth
+﻿using System.Security.Claims;
+
+namespace NorthwindRestApi.DTOs.Auth
 {
     public class AuthResponseDto
     {
@@ -19,5 +21,6 @@
         public IEnumerable<string> Permissions { get; set; } = new List<string>();
         public IEnumerable<UserReadDto> Users { get; set; } = new List<UserReadDto>();
         public IEnumerable<RolePermissionsDto> RolePermissions { get; set; } = new List<RolePermissionsDto>();
+        public IEnumerable<ClaimDto> Claims { get; set; } = new List<ClaimDto>();
     }
 }
