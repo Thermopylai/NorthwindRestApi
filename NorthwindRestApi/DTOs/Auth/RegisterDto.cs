@@ -13,7 +13,7 @@ namespace NorthwindRestApi.DTOs.Auth
         public string Email { get; set; } = "";
 
         [Required]
-        [StringLength(100, MinimumLength = 16)]
+        [StringLength(100, MinimumLength = 15)]
         public string Password { get; set; } = "";
     }
 }

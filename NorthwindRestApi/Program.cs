@@ -25,7 +25,7 @@ namespace NorthwindRestApi
 
             builder.Services.AddIdentityCore<ApplicationUser>(options =>
                 {
-                    options.Password.RequiredLength = 16;
+                    options.Password.RequiredLength = 15;
                     options.Password.RequireDigit = true;
                     options.Password.RequireLowercase = true;
                     options.Password.RequireUppercase = true;
