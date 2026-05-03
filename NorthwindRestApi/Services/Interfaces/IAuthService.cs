@@ -9,8 +9,8 @@ namespace NorthwindRestApi.Services.Interfaces
         Task<AuthResponseDto> LoginAsync(LoginDto dto, CancellationToken ct);
         Task<AuthResponseDto> RefreshAsync(RefreshTokenRequestDto dto, CancellationToken ct);
         Task<AuthResponseDto> LogoutAsync(LogoutDto dto, CancellationToken ct);
-        Task<AuthResponseDto> AssignRoleAsync(AssignRoleDto dto, CancellationToken ct);
-        Task<AuthResponseDto> RemoveRoleAsync(AssignRoleDto dto, CancellationToken ct);
+        Task<AuthResponseDto> AssignRoleAsync(UserRoleDto dto, CancellationToken ct);
+        Task<AuthResponseDto> RemoveRoleAsync(UserRoleDto dto, CancellationToken ct);
         Task<AuthResponseDto> ChangePasswordAsync(ClaimsPrincipal user, ChangePasswordDto dto, CancellationToken ct);
         Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto, CancellationToken ct);
         Task<AuthResponseDto> UpdateUserAsync(ClaimsPrincipal user, UpdateUserDto dto, CancellationToken ct);

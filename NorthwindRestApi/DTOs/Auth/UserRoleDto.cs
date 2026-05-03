@@ -2,10 +2,10 @@
 
 namespace NorthwindRestApi.DTOs.Auth
 {
-    public class AssignRoleDto
+    public class UserRoleDto
     {
         [Required]
-        public string UserName { get; set; } = "";
+        public string UserId { get; set; } = "";
 
         [Required]
         public string RoleName { get; set; } = "";

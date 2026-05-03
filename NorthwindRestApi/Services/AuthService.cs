@@ -328,9 +328,9 @@ namespace NorthwindRestApi.Services
             };
         }
 
-        public async Task<AuthResponseDto> AssignRoleAsync(AssignRoleDto dto, CancellationToken ct)
+        public async Task<AuthResponseDto> AssignRoleAsync(UserRoleDto dto, CancellationToken ct)
         {
-            var user = await _userManager.FindByNameAsync(dto.UserName);
+            var user = await _userManager.FindByIdAsync(dto.UserId);
             if (user == null)
             {
                 return new AuthResponseDto
@@ -372,13 +372,13 @@ namespace NorthwindRestApi.Services
             return new AuthResponseDto
             {
                 Success = true,
-                Message = $"Role '{dto.RoleName}' assigned to '{dto.UserName}'."
+                Message = $"Role '{dto.RoleName}' assigned to '{user.UserName}'."
             };
         }
 
-        public async Task<AuthResponseDto> RemoveRoleAsync(AssignRoleDto dto, CancellationToken ct)
+        public async Task<AuthResponseDto> RemoveRoleAsync(UserRoleDto dto, CancellationToken ct)
         {
-            var user = await _userManager.FindByNameAsync(dto.UserName);
+            var user = await _userManager.FindByIdAsync(dto.UserId);
 
             if (user == null)
             {
@@ -421,7 +421,7 @@ namespace NorthwindRestApi.Services
             return new AuthResponseDto
             {
                 Success = true,
-                Message = $"Role '{dto.RoleName}' removed from '{dto.UserName}'."
+                Message = $"Role '{dto.RoleName}' removed from '{user.UserName}'."
             };
         }
 
@@ -470,7 +470,7 @@ namespace NorthwindRestApi.Services
 
         public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto, CancellationToken ct)
         {
-            var user = await _userManager.FindByNameAsync(dto.UserName);
+            var user = await _userManager.FindByIdAsync(dto.UserId);
 
             if (user == null)
             {

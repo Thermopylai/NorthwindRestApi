@@ -149,7 +149,7 @@ namespace NorthwindRestApi.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AuthResponseDto>> AssignRole(
-            AssignRoleDto dto,
+            UserRoleDto dto,
             CancellationToken ct)
         {
             var result = await _service.AssignRoleAsync(dto, ct);
@@ -167,7 +167,7 @@ namespace NorthwindRestApi.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AuthResponseDto>> RemoveRole(
-            AssignRoleDto dto,
+            UserRoleDto dto,
             CancellationToken ct)
         {
             var result = await _service.RemoveRoleAsync(dto, ct);
