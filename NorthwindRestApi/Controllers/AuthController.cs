@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NorthwindRestApi.DTOs.Auth;
 using NorthwindRestApi.Services.Interfaces;
+using System.Security.Claims;
 
 namespace NorthwindRestApi.Controllers
 {
@@ -188,7 +189,8 @@ namespace NorthwindRestApi.Controllers
             string userId,
             CancellationToken ct)
         {
-            var result = await _service.DeleteUserAsync(userId, ct);
+            var user = User;
+            var result = await _service.DeleteUserAsync(userId, user, ct);
 
             if (!result.Success)
                 return BadRequest(result);

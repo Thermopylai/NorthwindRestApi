@@ -548,11 +548,21 @@ namespace NorthwindRestApi.Services
             };
         }
 
-        public async Task<AuthResponseDto> DeleteUserAsync(string userId, CancellationToken ct)
+        public async Task<AuthResponseDto> DeleteUserAsync(string userId, ClaimsPrincipal user, CancellationToken ct)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var delUser = await _userManager.FindByIdAsync(userId);
+            var currentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (user == null)
+            if (currentUserId == userId)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Users cannot delete themselves."
+                };
+            }
+
+            if (delUser == null)
             {
                 return new AuthResponseDto
                 {
@@ -561,7 +571,16 @@ namespace NorthwindRestApi.Services
                 };
             }
 
-            var result = await _userManager.DeleteAsync(user);
+            if (delUser.UserName == "admin")
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Cannot delete the default admin user."
+                };
+            }
+
+            var result = await _userManager.DeleteAsync(delUser);
 
             if (!result.Succeeded)
             {
