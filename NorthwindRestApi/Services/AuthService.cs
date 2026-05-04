@@ -805,66 +805,79 @@ namespace NorthwindRestApi.Services
             var users = await query.ToListAsync(ct);
             var userIds = users.Select(u => u.Id).ToList();
 
-            // Batch load roles for all matched users in ONE query
-            var userRoleRows = await (
-                from ur in _authDbContext.UserRoles
-                join r in _authDbContext.Roles on ur.RoleId equals r.Id
-                where userIds.Contains(ur.UserId)
-                select new
-                {
-                    ur.UserId,
-                    RoleName = r.Name
-                }
-            ).ToListAsync(ct);
-
-            var rolesByUserId = userRoleRows
-                .Where(x => !string.IsNullOrWhiteSpace(x.RoleName))
-                .GroupBy(x => x.UserId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => (IList<string>)g.Select(x => x.RoleName!).Distinct().ToList()
-                );
-
-            var userDtos = users.Select(u =>
+            if (users.Count > 0)
             {
-                rolesByUserId.TryGetValue(u.Id, out var roles);
-                roles ??= new List<string>();
 
-                var permissions = roles
-                    .SelectMany(role => RolePermissions.Map.TryGetValue(role, out var perms)
-                        ? perms
-                        : Array.Empty<string>())
-                    .Distinct()
-                    .ToList();
-
-                var rolePermissions = roles
-                    .Distinct()
-                    .Select(role => new RolePermissionsDto
+                // Batch load roles for all matched users in ONE query
+                var userRoleRows = await (
+                    from ur in _authDbContext.UserRoles
+                    join r in _authDbContext.Roles on ur.RoleId equals r.Id
+                    where userIds.Contains(ur.UserId)
+                    select new
                     {
-                        RoleName = role,
-                        Permissions = RolePermissions.Map.TryGetValue(role, out var perms)
-                            ? perms
-                            : Array.Empty<string>()
-                    })
-                    .ToList();
+                        ur.UserId,
+                        RoleName = r.Name
+                    }
+                ).ToListAsync(ct);
 
-                return new UserReadDto
+                var rolesByUserId = userRoleRows
+                    .Where(x => !string.IsNullOrWhiteSpace(x.RoleName))
+                    .GroupBy(x => x.UserId)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => (IList<string>)g.Select(x => x.RoleName!).Distinct().ToList()
+                    );
+
+                var userDtos = users.Select(u =>
                 {
-                    UserId = u.Id,
-                    UserName = u.UserName ?? "",
-                    Email = u.Email ?? "",
-                    Roles = roles,
-                    Permissions = permissions,
-                    RolePermissions = rolePermissions
-                };
-            }).ToList();
+                    rolesByUserId.TryGetValue(u.Id, out var roles);
+                    roles ??= new List<string>();
 
-            return new AuthResponseDto
+                    var permissions = roles
+                        .SelectMany(role => RolePermissions.Map.TryGetValue(role, out var perms)
+                            ? perms
+                            : Array.Empty<string>())
+                        .Distinct()
+                        .ToList();
+
+                    var rolePermissions = roles
+                        .Distinct()
+                        .Select(role => new RolePermissionsDto
+                        {
+                            RoleName = role,
+                            Permissions = RolePermissions.Map.TryGetValue(role, out var perms)
+                                ? perms
+                                : Array.Empty<string>()
+                        })
+                        .ToList();
+
+                    return new UserReadDto
+                    {
+                        UserId = u.Id,
+                        UserName = u.UserName ?? "",
+                        Email = u.Email ?? "",
+                        Roles = roles,
+                        Permissions = permissions,
+                        RolePermissions = rolePermissions
+                    };
+                }).ToList();
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Search completed successfully.",
+                    Users = userDtos
+                };
+            }
+            else
             {
-                Success = true,
-                Message = "Search completed successfully.",
-                Users = userDtos
-            };
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Search completed successfully. No users matched the criteria.",
+                    Users = new List<UserReadDto>()
+                };
+            }
         }
 
         public async Task<AuthResponseDto> ListRolePermissionsAsync(CancellationToken ct)
