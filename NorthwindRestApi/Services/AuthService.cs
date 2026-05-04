@@ -407,6 +407,15 @@ namespace NorthwindRestApi.Services
                 };
             }
 
+            if (user.UserName == "admin" && dto.RoleName == "Admin")
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Cannot remove 'Admin' role from the default admin user."
+                };
+            }
+
             var result = await _userManager.RemoveFromRoleAsync(user, dto.RoleName);
 
             if (!result.Succeeded)
